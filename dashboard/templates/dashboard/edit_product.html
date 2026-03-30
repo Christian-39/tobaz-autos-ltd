@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1" style="color: var(--text-primary);">Edit Product</h1>
+        <p class="mb-0" style="color: var(--text-secondary);">Update product information</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary" target="_blank">
+            <i class="fas fa-eye me-2"></i>View
+        </a>
+        <a href="{% url 'dashboard:product_management' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" enctype="multipart/form-data" id="productForm">
+            {% csrf_token %}
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-info-circle me-2" style="color: var(--primary-color);"></i>Basic Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Product Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required value="{{ product.name }}">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Category <span class="text-danger">*</span></label>
+                            <select name="category" class="form-select" required>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if product.category.id == cat.id %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Product Type <span class="text-danger">*</span></label>
+                            <select name="category_type" class="form-select" required>
+                                <option value="small_cars" {% if product.category_type == 'small_cars' %}selected{% endif %}>Small Cars</option>
+                                <option value="auto_parts" {% if product.category_type == 'auto_parts' %}selected{% endif %}>Auto Parts</option>
+                                <option value="tools" {% if product.category_type == 'tools' %}selected{% endif %}>Tools</option>
+                                <option value="oil" {% if product.category_type == 'oil' %}selected{% endif %}>Oil</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Price <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--bg-secondary);">$</span>
+                                <input type="number" name="price" class="form-control" step="0.01" min="0" required value="{{ product.price }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                            <input type="number" name="quantity" class="form-control" min="0" required value="{{ product.quantity }}">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control" rows="4" required>{{ product.description }}</textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">Specifications</label>
+                            <textarea name="specifications" class="form-control" rows="3">{{ product.specifications|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if product.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">Active</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" {% if product.is_featured %}checked{% endif %}>
+                                <label class="form-check-label" for="is_featured">Featured</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Existing Images -->
+            {% if images %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-images me-2" style="color: var(--primary-color);"></i>Current Images
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for image in images %}
+                        <div class="col-4 col-md-3">
+                            <div class="position-relative">
+                                <img src="{{ image.image.url }}" class="img-fluid rounded" style="height: 100px; object-fit: cover; width: 100%;">
+                                {% if image.is_primary %}
+                                <span class="badge bg-primary position-absolute top-0 start-0 m-1">Primary</span>
+                                {% else %}
+                                <a href="{% url 'dashboard:set_primary_image' image.id %}" class="btn btn-sm btn-outline-primary position-absolute top-0 start-0 m-1" title="Set as Primary">
+                                    <i class="fas fa-star"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'dashboard:delete_image' image.id %}" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="return confirm('Delete this image?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Add New Images -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-plus-circle me-2" style="color: var(--primary-color);"></i>Add New Images
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="file" name="images" class="form-control" multiple accept="image/*" id="imageInput">
+                    </div>
+                    <div id="imagePreview" class="row g-3"></div>
+                </div>
+            </div>
+            
+            <!-- Existing Videos -->
+            {% if videos %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-video me-2" style="color: var(--primary-color);"></i>Current Videos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for video in videos %}
+                    <div class="mb-3 p-3 rounded" style="background: var(--bg-secondary);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-video" style="color: var(--primary-color);"></i>
+                                <span style="color: var(--text-primary);">{{ video.title|default:video.video.name }}</span>
+                            </div>
+                            <a href="{% url 'dashboard:delete_video' video.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this video?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Add New Videos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-plus-circle me-2" style="color: var(--primary-color);"></i>Add New Videos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="file" name="videos" class="form-control" multiple accept="video/*" id="videoInput">
+                    </div>
+                    <div id="videoPreview"></div>
+                </div>
+            </div>
+            
+            <!-- SEO -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-search me-2" style="color: var(--primary-color);"></i>SEO Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Meta Title</label>
+                        <input type="text" name="meta_title" class="form-control" value="{{ product.meta_title|default:'' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meta Description</label>
+                        <textarea name="meta_description" class="form-control" rows="2">{{ product.meta_description|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-3 mb-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+                <a href="{% url 'dashboard:product_management' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Product Info Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-info-circle me-2" style="color: var(--primary-color);"></i>Product Info
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">SKU</small>
+                    <p class="mb-0" style="color: var(--text-primary); font-weight: 500;">{{ product.sku }}</p>
+                </div>
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">Created</small>
+                    <p class="mb-0" style="color: var(--text-primary);">{{ product.created_at|date:"F d, Y" }}</p>
+                </div>
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">Last Updated</small>
+                    <p class="mb-0" style="color: var(--text-primary);">{{ product.updated_at|date:"F d, Y H:i" }}</p>
+                </div>
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">Total Sales</small>
+                    <p class="mb-0" style="color: var(--text-primary);">{{ product.total_sales }} units</p>
+                </div>
+                <div>
+                    <small style="color: var(--text-muted);">Stock Status</small>
+                    <p class="mb-0">
+                        <span class="badge {% if product.stock_status == 'in_stock' %}bg-success{% elif product.stock_status == 'low_stock' %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ product.get_stock_status_display|default:product.stock_status }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p class="small" style="color: var(--text-secondary);">Once deleted, this product cannot be recovered.</p>
+                <a href="{% url 'dashboard:delete_product' product.slug %}" class="btn btn-outline-danger w-100">
+                    <i class="fas fa-trash me-2"></i>Delete Product
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Image Preview
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = '';
+        
+        Array.from(e.target.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'col-4 col-md-3';
+                div.innerHTML = `
+                    <div class="position-relative">
+                        <img src="${e.target.result}" class="img-fluid rounded" style="height: 100px; object-fit: cover;">
+                        <span class="badge bg-secondary position-absolute top-0 start-0 m-1">New</span>
+                    </div>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+    
+    // Video Preview
+    document.getElementById('videoInput').addEventListener('change', function(e) {
+        const preview = document.getElementById('videoPreview');
+        preview.innerHTML = '';
+        
+        Array.from(e.target.files).forEach((file, index) => {
+            const div = document.createElement('div');
+            div.className = 'mb-2';
+            div.innerHTML = `
+                <div class="d-flex align-items-center gap-2 p-2 rounded" style="background: var(--bg-secondary);">
+                    <i class="fas fa-video" style="color: var(--primary-color);"></i>
+                    <span style="color: var(--text-primary);">${file.name}</span>
+                    <span class="badge bg-secondary">${(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                    <span class="badge bg-info">New</span>
+                </div>
+            `;
+            preview.appendChild(div);
+        });
+    });
+</script>
+{% endblock %}

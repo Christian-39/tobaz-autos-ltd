@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1" style="color: var(--text-primary);">Products</h1>
+        <p class="mb-0" style="color: var(--text-secondary);">{{ total_results }} products found</p>
+    </div>
+    <a href="{% url 'dashboard:add_product' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Product
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+            {% endif %}
+            
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-secondary);">Category</label>
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-secondary);">Product Type</label>
+                <select name="type" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Types</option>
+                    <option value="small_cars" {% if selected_type == 'small_cars' %}selected{% endif %}>Small Cars</option>
+                    <option value="auto_parts" {% if selected_type == 'auto_parts' %}selected{% endif %}>Auto Parts</option>
+                    <option value="tools" {% if selected_type == 'tools' %}selected{% endif %}>Tools</option>
+                    <option value="oil" {% if selected_type == 'oil' %}selected{% endif %}>Oil</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-secondary);">Sort By</label>
+                <select name="sort" class="form-select" onchange="this.form.submit()">
+                    <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                    <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name: A-Z</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-times me-2"></i>Clear Filters
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Products Grid -->
+<div class="row g-4">
+    {% for product in products %}
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="product-card position-relative">
+            {% if product.stock_status == 'low_stock' %}
+                <span class="stock-badge stock-low">Low Stock</span>
+            {% elif product.stock_status == 'out_of_stock' %}
+                <span class="stock-badge stock-out">Out of Stock</span>
+            {% elif product.is_featured %}
+                <span class="stock-badge" style="background: var(--primary-color); color: white;">Featured</span>
+            {% endif %}
+            
+            <a href="{{ product.get_absolute_url }}">
+                {% if product.primary_image %}
+                    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                    <div class="product-image d-flex align-items-center justify-content-center" style="background: var(--bg-tertiary);">
+                        <i class="fas fa-image fa-3x" style="color: var(--text-muted);"></i>
+                    </div>
+                {% endif %}
+            </a>
+            
+            <div class="product-content">
+                <div class="small mb-1" style="color: var(--primary-color);">{{ product.category.name }}</div>
+                <h5 class="product-title">
+                    <a href="{{ product.get_absolute_url }}" class="text-decoration-none" style="color: var(--text-primary);">
+                        {{ product.name|truncatechars:25 }}
+                    </a>
+                </h5>
+                <p class="small mb-2" style="color: var(--text-secondary);">{{ product.description|truncatechars:50 }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="product-price">${{ product.price }}</span>
+                    <span class="small" style="color: var(--text-secondary);">Stock: {{ product.quantity }}</span>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <a href="{{ product.get_absolute_url }}" class="btn btn-sm btn-primary flex-fill">
+                        <i class="fas fa-eye me-1"></i>View
+                    </a>
+                    <a href="{% url 'dashboard:edit_product' product.slug %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card text-center py-5">
+            <div class="card-body">
+                <i class="fas fa-search fa-3x mb-3" style="color: var(--text-muted);"></i>
+                <h4 style="color: var(--text-primary);">No products found</h4>
+                <p style="color: var(--text-secondary);">Try adjusting your search or filters</p>
+                <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+                    <i class="fas fa-list me-2"></i>View All Products
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if products.has_other_pages %}
+<div class="d-flex justify-content-center mt-5">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if products.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+<style>
+    .product-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    .product-content {
+        padding: 1rem;
+    }
+    
+    .product-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-title a:hover {
+        color: var(--primary-color) !important;
+    }
+    
+    .product-price {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    
+    .stock-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        z-index: 10;
+    }
+    
+    .stock-in { background: rgba(16, 185, 129, 0.9); color: white; }
+    .stock-low { background: rgba(245, 158, 11, 0.9); color: white; }
+    .stock-out { background: rgba(239, 68, 68, 0.9); color: white; }
+    
+    .pagination .page-link {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .pagination .page-link:hover {
+        background: var(--bg-secondary);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <img src="/static/images/logo.png" alt="Tobaz Autos" style="width: 100px; height: 100px; margin-bottom: 1.5rem;">
+                    <h1 class="display-5 fw-bold mb-3" style="color: var(--primary-color);">About Tobaz Autos</h1>
+                    <p class="lead" style="color: var(--text-secondary);">Your Trusted Partner in Automotive Excellence</p>
+                </div>
+                
+                <div class="mb-5">
+                    <h2 class="h4 mb-3">Our Story</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.8;">
+                        Tobaz Autos was founded with a simple mission: to provide high-quality automotive products 
+                        and exceptional service to our customers. What started as a small auto parts store has grown 
+                        into a comprehensive automotive solutions provider, serving thousands of satisfied customers 
+                        across the region.
+                    </p>
+                    <p style="color: var(--text-secondary); line-height: 1.8;">
+                        We pride ourselves on our extensive inventory, competitive prices, and knowledgeable staff 
+                        who are always ready to help you find the right products for your vehicle.
+                    </p>
+                </div>
+                
+                <div class="mb-5">
+                    <h2 class="h4 mb-3">Our Products</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="flex-shrink-0" style="width: 50px; height: 50px; background: rgba(107, 33, 168, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-car" style="color: var(--primary-color);"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: var(--text-primary);">Small Cars</h5>
+                                    <p class="small mb-0" style="color: var(--text-secondary);">Quality vehicles at competitive prices</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="flex-shrink-0" style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-cogs" style="color: var(--success-color);"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: var(--text-primary);">Auto Parts</h5>
+                                    <p class="small mb-0" style="color: var(--text-secondary);">Genuine and aftermarket parts</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="flex-shrink-0" style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-tools" style="color: var(--warning-color);"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: var(--text-primary);">Tools</h5>
+                                    <p class="small mb-0" style="color: var(--text-secondary);">Professional-grade automotive tools</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="flex-shrink-0" style="width: 50px; height: 50px; background: rgba(59, 130, 246, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-oil-can" style="color: var(--info-color);"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: var(--text-primary);">Oil & Lubricants</h5>
+                                    <p class="small mb-0" style="color: var(--text-secondary);">Premium oils and fluids</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-5">
+                    <h2 class="h4 mb-3">Why Choose Us?</h2>
+                    <div class="row g-3">
+                        <div class="col-md-4 text-center">
+                            <div class="mb-3" style="width: 60px; height: 60px; background: rgba(107, 33, 168, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                <i class="fas fa-check-circle fa-2x" style="color: var(--primary-color);"></i>
+                            </div>
+                            <h6 style="color: var(--text-primary);">Quality Guaranteed</h6>
+                            <p class="small" style="color: var(--text-secondary);">All products meet strict quality standards</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="mb-3" style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                <i class="fas fa-dollar-sign fa-2x" style="color: var(--success-color);"></i>
+                            </div>
+                            <h6 style="color: var(--text-primary);">Competitive Prices</h6>
+                            <p class="small" style="color: var(--text-secondary);">Best prices in the market</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="mb-3" style="width: 60px; height: 60px; background: rgba(245, 158, 11, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                <i class="fas fa-headset fa-2x" style="color: var(--warning-color);"></i>
+                            </div>
+                            <h6 style="color: var(--text-primary);">Expert Support</h6>
+                            <p class="small" style="color: var(--text-secondary);">Knowledgeable staff ready to help</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="{% url 'core:contact' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-envelope me-2"></i>Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

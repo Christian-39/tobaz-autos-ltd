@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <img src="/static/images/logo.png" alt="Tobaz Autos" style="width: 80px; height: 80px; margin-bottom: 1rem;">
+                    <h2 class="h3 mb-2" style="color: var(--text-primary);">Create Account</h2>
+                    <p class="mb-0" style="color: var(--text-secondary);">Join Tobaz Autos today</p>
+                </div>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">First Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--bg-secondary); border-color: var(--border-color);">
+                                    <i class="fas fa-user" style="color: var(--text-muted);"></i>
+                                </span>
+                                <input type="text" name="first_name" class="form-control" placeholder="First name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">Last Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--bg-secondary); border-color: var(--border-color);">
+                                    <i class="fas fa-user" style="color: var(--text-muted);"></i>
+                                </span>
+                                <input type="text" name="last_name" class="form-control" placeholder="Last name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label" style="color: var(--text-primary);">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--bg-secondary); border-color: var(--border-color);">
+                                    <i class="fas fa-at" style="color: var(--text-muted);"></i>
+                                </span>
+                                <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label" style="color: var(--text-primary);">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--bg-secondary); border-color: var(--border-color);">
+                                    <i class="fas fa-envelope" style="color: var(--text-muted);"></i>
+                                </span>
+                                <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--bg-secondary); border-color: var(--border-color);">
+                                    <i class="fas fa-lock" style="color: var(--text-muted);"></i>
+                                </span>
+                                <input type="password" name="password1" class="form-control" placeholder="Password" required>
+                            </div>
+                            <div class="form-text" style="color: var(--text-muted); font-size: 0.75rem;">
+                                At least 8 characters
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--bg-secondary); border-color: var(--border-color);">
+                                    <i class="fas fa-lock" style="color: var(--text-muted);"></i>
+                                </span>
+                                <input type="password" name="password2" class="form-control" placeholder="Confirm password" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check mt-3 mb-4">
+                        <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                        <label class="form-check-label" for="terms" style="color: var(--text-secondary); font-size: 0.875rem;">
+                            I agree to the <a href="#" style="color: var(--primary-color);">Terms of Service</a> and 
+                            <a href="#" style="color: var(--primary-color);">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+                    
+                    <div class="text-center">
+                        <p class="mb-0" style="color: var(--text-secondary);">
+                            Already have an account? 
+                            <a href="{% url 'users:login' %}" style="color: var(--primary-color);">Sign in</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .input-group-text {
+        color: var(--text-primary);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}

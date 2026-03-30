@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1" style="color: var(--text-primary);">Product Management</h1>
+        <p class="mb-0" style="color: var(--text-secondary);">Manage your product catalog</p>
+    </div>
+    <a href="{% url 'dashboard:add_product' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Product
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-secondary);">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background: var(--bg-secondary);">
+                        <i class="fas fa-search" style="color: var(--text-muted);"></i>
+                    </span>
+                    <input type="text" name="q" class="form-control" placeholder="Product name, SKU..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-secondary);">Category</label>
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-secondary);">Stock Status</label>
+                <select name="stock" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Stock</option>
+                    <option value="in_stock" {% if stock_status == 'in_stock' %}selected{% endif %}>In Stock</option>
+                    <option value="low_stock" {% if stock_status == 'low_stock' %}selected{% endif %}>Low Stock</option>
+                    <option value="out_of_stock" {% if stock_status == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if product.primary_image %}
+                                    <img src="{{ product.primary_image.image.url }}" alt="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                {% else %}
+                                    <div style="width: 50px; height: 50px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-image" style="color: var(--text-muted);"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <a href="{{ product.get_absolute_url }}" style="color: var(--primary-color); font-weight: 500;">
+                                        {{ product.name|truncatechars:30 }}
+                                    </a>
+                                    {% if product.is_featured %}
+                                        <span class="badge bg-warning ms-2">Featured</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td style="color: var(--text-secondary);">{{ product.sku }}</td>
+                        <td>{{ product.category.name }}</td>
+                        <td style="color: var(--primary-color); font-weight: 600;">${{ product.price }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if product.quantity > 5 %}bg-success
+                                {% elif product.quantity > 0 %}bg-warning
+                                {% else %}bg-danger{% endif %}">
+                                {{ product.quantity }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if product.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ product.get_absolute_url }}">
+                                            <i class="fas fa-eye me-2"></i>View
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'dashboard:edit_product' product.slug %}">
+                                            <i class="fas fa-edit me-2"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{% url 'dashboard:delete_product' product.slug %}">
+                                            <i class="fas fa-trash me-2"></i>Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-box-open fa-3x mb-3" style="color: var(--text-muted);"></i>
+                            <p style="color: var(--text-secondary);">No products found</p>
+                            <a href="{% url 'dashboard:add_product' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-2"></i>Add Product
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if products.has_other_pages %}
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if products.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if stock_status %}&stock={{ stock_status }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if stock_status %}&stock={{ stock_status }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if stock_status %}&stock={{ stock_status }}{% endif %}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+<style>
+    .table thead th {
+        background: var(--bg-secondary);
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    
+    .table tbody tr:hover {
+        background: var(--bg-secondary);
+    }
+    
+    .pagination .page-link {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}

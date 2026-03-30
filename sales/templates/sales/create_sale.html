@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1" style="color: var(--text-primary);">Create New Sale</h1>
+        <p class="mb-0" style="color: var(--text-secondary);">Add products and complete the sale</p>
+    </div>
+    <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Sales
+    </a>
+</div>
+
+<form method="post" id="saleForm">
+    {% csrf_token %}
+    
+    <div class="row g-4">
+        <!-- Products Section -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-box me-2" style="color: var(--primary-color);"></i>Products
+                    </h5>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addProductRow()">
+                        <i class="fas fa-plus me-2"></i>Add Product
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="productsContainer">
+                        <!-- Product rows will be added here -->
+                    </div>
+                    
+                    <div id="emptyState" class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-3x mb-3" style="color: var(--text-muted);"></i>
+                        <p style="color: var(--text-secondary);">No products added yet</p>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="addProductRow()">
+                            <i class="fas fa-plus me-2"></i>Add Product
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Available Products -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-list me-2" style="color: var(--primary-color);"></i>Quick Add Products
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if product.primary_image %}
+                                                <img src="{{ product.primary_image.image.url }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
+                                            {% else %}
+                                                <div style="width: 40px; height: 40px; background: var(--bg-tertiary); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-image" style="color: var(--text-muted); font-size: 0.875rem;"></i>
+                                                </div>
+                                            {% endif %}
+                                            <span style="color: var(--text-primary);">{{ product.name|truncatechars:30 }}</span>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--primary-color); font-weight: 600;">${{ product.price }}</td>
+                                    <td>
+                                        <span class="badge {% if product.quantity > 5 %}bg-success{% elif product.quantity > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ product.quantity }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="quickAddProduct({{ product.id }}, '{{ product.name|escapejs }}', {{ product.price }}, {{ product.quantity }})" {% if product.quantity == 0 %}disabled{% endif %}>
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sale Summary -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-receipt me-2" style="color: var(--primary-color);"></i>Sale Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Customer Info -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: var(--text-primary);">Customer Information</h6>
+                        <div class="mb-3">
+                            <label class="form-label small" style="color: var(--text-secondary);">Customer Name</label>
+                            <input type="text" name="customer_name" class="form-control" placeholder="Walk-in Customer">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small" style="color: var(--text-secondary);">Email</label>
+                            <input type="email" name="customer_email" class="form-control" placeholder="customer@email.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small" style="color: var(--text-secondary);">Phone</label>
+                            <input type="tel" name="customer_phone" class="form-control" placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                    
+                    <hr style="border-color: var(--border-color);">
+                    
+                    <!-- Payment Method -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: var(--text-primary);">Payment</h6>
+                        <select name="payment_method" class="form-select">
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="transfer">Bank Transfer</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <hr style="border-color: var(--border-color);">
+                    
+                    <!-- Totals -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="color: var(--text-secondary);">Subtotal:</span>
+                            <span id="subtotal" style="color: var(--text-primary); font-weight: 500;">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span style="color: var(--text-primary); font-size: 1.125rem; font-weight: 600;">Total:</span>
+                            <span id="total" style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">$0.00</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="mb-4">
+                        <label class="form-label small" style="color: var(--text-secondary);">Notes</label>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="Add any notes..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100" id="completeSaleBtn" disabled>
+                        <i class="fas fa-check me-2"></i>Complete Sale
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+    .product-row {
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .table thead th {
+        background: var(--bg-secondary);
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+    
+    .table tbody tr:hover {
+        background: var(--bg-secondary);
+    }
+</style>
+
+<script>
+    let productCount = 0;
+    const productsData = {};
+    
+    function addProductRow(productId = null, productName = '', productPrice = 0, maxStock = 0) {
+        const container = document.getElementById('productsContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        emptyState.style.display = 'none';
+        
+        productCount++;
+        const rowId = `product-${productCount}`;
+        
+        const row = document.createElement('div');
+        row.className = 'product-row';
+        row.id = rowId;
+        row.innerHTML = `
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small" style="color: var(--text-secondary);">Product</label>
+                    <select name="product_id[]" class="form-select product-select" onchange="updateProductPrice(this)" required>
+                        <option value="">Select Product</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}" data-price="{{ product.price }}" data-stock="{{ product.quantity }}" ${productId == {{ product.id }} ? 'selected' : ''}>
+                            {{ product.name }} (Stock: {{ product.quantity }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small" style="color: var(--text-secondary);">Quantity</label>
+                    <input type="number" name="quantity[]" class="form-control quantity-input" min="1" value="1" onchange="calculateTotals()" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small" style="color: var(--text-secondary);">Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: var(--bg-secondary);">$</span>
+                        <input type="text" class="form-control price-display" readonly value="${productPrice.toFixed(2)}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-outline-danger w-100" onclick="removeProductRow('${rowId}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(row);
+        
+        if (productId) {
+            const select = row.querySelector('.product-select');
+            select.value = productId;
+            updateProductPrice(select);
+        }
+        
+        calculateTotals();
+    }
+    
+    function quickAddProduct(productId, productName, productPrice, maxStock) {
+        if (maxStock <= 0) {
+            alert('This product is out of stock!');
+            return;
+        }
+        addProductRow(productId, productName, productPrice, maxStock);
+    }
+    
+    function removeProductRow(rowId) {
+        const row = document.getElementById(rowId);
+        row.remove();
+        calculateTotals();
+        
+        if (document.querySelectorAll('.product-row').length === 0) {
+            document.getElementById('emptyState').style.display = 'block';
+        }
+    }
+    
+    function updateProductPrice(select) {
+        const row = select.closest('.product-row');
+        const priceDisplay = row.querySelector('.price-display');
+        const quantityInput = row.querySelector('.quantity-input');
+        
+        const selectedOption = select.options[select.selectedIndex];
+        const price = parseFloat(selectedOption.dataset.price) || 0;
+        const stock = parseInt(selectedOption.dataset.stock) || 0;
+        
+        priceDisplay.value = price.toFixed(2);
+        quantityInput.max = stock;
+        
+        if (parseInt(quantityInput.value) > stock) {
+            quantityInput.value = stock;
+        }
+        
+        calculateTotals();
+    }
+    
+    function calculateTotals() {
+        let subtotal = 0;
+        const rows = document.querySelectorAll('.product-row');
+        
+        rows.forEach(row => {
+            const select = row.querySelector('.product-select');
+            const quantity = parseInt(row.querySelector('.quantity-input').value) || 0;
+            const selectedOption = select.options[select.selectedIndex];
+            const price = parseFloat(selectedOption.dataset.price) || 0;
+            
+            subtotal += price * quantity;
+        });
+        
+        document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('total').textContent = '$' + subtotal.toFixed(2);
+        
+        // Enable/disable complete button
+        document.getElementById('completeSaleBtn').disabled = rows.length === 0;
+    }
+    
+    // Form validation
+    document.getElementById('saleForm').addEventListener('submit', function(e) {
+        const rows = document.querySelectorAll('.product-row');
+        if (rows.length === 0) {
+            e.preventDefault();
+            alert('Please add at least one product to the sale.');
+            return false;
+        }
+        
+        let valid = true;
+        rows.forEach(row => {
+            const select = row.querySelector('.product-select');
+            if (!select.value) {
+                valid = false;
+                select.classList.add('is-invalid');
+            } else {
+                select.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!valid) {
+            e.preventDefault();
+            alert('Please select a product for all rows.');
+            return false;
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-user-edit me-2" style="color: var(--primary-color);"></i>Edit Profile
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <!-- Profile Image -->
+                        <div class="col-12">
+                            <label class="form-label" style="color: var(--text-primary);">Profile Image</label>
+                            <div class="d-flex align-items-center gap-4">
+                                {% if profile_form.instance.profile_image %}
+                                    <img src="{{ profile_form.instance.profile_image.url }}" alt="Current" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; background: var(--primary-color);">
+                                        <span class="text-white" style="font-size: 2.5rem; font-weight: 600;">
+                                            {{ user.first_name|first|default:user.username|first|upper }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <input type="file" name="profile_image" class="form-control" accept="image/*">
+                                    <div class="form-text" style="color: var(--text-muted);">Recommended: 400x400px, Max 2MB</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Info -->
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ user_form.first_name.value|default:'' }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ user_form.last_name.value|default:'' }}" required>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label" style="color: var(--text-primary);">Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ user_form.email.value|default:'' }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">Phone</label>
+                            <input type="tel" name="phone" class="form-control" value="{{ profile_form.phone.value|default:'' }}" placeholder="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">City</label>
+                            <input type="text" name="city" class="form-control" value="{{ profile_form.city.value|default:'' }}">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-primary);">Country</label>
+                            <input type="text" name="country" class="form-control" value="{{ profile_form.country.value|default:'' }}">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label" style="color: var(--text-primary);">Address</label>
+                            <textarea name="address" class="form-control" rows="3">{{ profile_form.address.value|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label" style="color: var(--text-primary);">Bio</label>
+                            <textarea name="bio" class="form-control" rows="4" placeholder="Tell us about yourself...">{{ profile_form.bio.value|default:'' }}</textarea>
+                        </div>
+                        
+                        <!-- Notification Preferences -->
+                        <div class="col-12">
+                            <h6 class="mb-3" style="color: var(--text-primary);">Notification Preferences</h6>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="email_notifications" name="email_notifications" {% if profile_form.email_notifications.value %}checked{% endif %}>
+                                <label class="form-check-label" for="email_notifications" style="color: var(--text-secondary);">
+                                    Receive email notifications
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="sms_notifications" name="sms_notifications" {% if profile_form.sms_notifications.value %}checked{% endif %}>
+                                <label class="form-check-label" for="sms_notifications" style="color: var(--text-secondary);">
+                                    Receive SMS notifications
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                        <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}

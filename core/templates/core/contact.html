@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold mb-3" style="color: var(--primary-color);">Contact Us</h1>
+            <p class="lead" style="color: var(--text-secondary);">We'd love to hear from you. Get in touch with us!</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Contact Information -->
+            <div class="col-md-5">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4" style="color: var(--text-primary);">Contact Information</h5>
+                        
+                        <div class="d-flex align-items-start gap-3 mb-4">
+                            <div class="flex-shrink-0" style="width: 45px; height: 45px; background: rgba(107, 33, 168, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-map-marker-alt" style="color: var(--primary-color);"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1" style="color: var(--text-primary);">Address</h6>
+                                <p class="small mb-0" style="color: var(--text-secondary);">
+                                    123 Auto Street<br>
+                                    Automotive District<br>
+                                    City, State 12345
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-start gap-3 mb-4">
+                            <div class="flex-shrink-0" style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-phone" style="color: var(--success-color);"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1" style="color: var(--text-primary);">Phone</h6>
+                                <p class="small mb-0" style="color: var(--text-secondary);">
+                                    +1 (555) 123-4567<br>
+                                    +1 (555) 987-6543
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-start gap-3 mb-4">
+                            <div class="flex-shrink-0" style="width: 45px; height: 45px; background: rgba(59, 130, 246, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-envelope" style="color: var(--info-color);"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1" style="color: var(--text-primary);">Email</h6>
+                                <p class="small mb-0" style="color: var(--text-secondary);">
+                                    info@tobazautos.com<br>
+                                    support@tobazautos.com
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="flex-shrink-0" style="width: 45px; height: 45px; background: rgba(245, 158, 11, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-clock" style="color: var(--warning-color);"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1" style="color: var(--text-primary);">Business Hours</h6>
+                                <p class="small mb-0" style="color: var(--text-secondary);">
+                                    Mon - Fri: 8:00 AM - 6:00 PM<br>
+                                    Saturday: 9:00 AM - 4:00 PM<br>
+                                    Sunday: Closed
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h6 class="mb-3" style="color: var(--text-primary);">Follow Us</h6>
+                        <div class="d-flex gap-2">
+                            <a href="#" class="btn btn-outline-primary btn-sm" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4" style="color: var(--text-primary);">Send us a Message</h5>
+                        
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" style="color: var(--text-primary);">First Name</label>
+                                    <input type="text" class="form-control" placeholder="Your first name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" style="color: var(--text-primary);">Last Name</label>
+                                    <input type="text" class="form-control" placeholder="Your last name" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="color: var(--text-primary);">Email</label>
+                                    <input type="email" class="form-control" placeholder="your@email.com" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="color: var(--text-primary);">Subject</label>
+                                    <select class="form-select">
+                                        <option value="">Select a subject</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="sales">Sales Question</option>
+                                        <option value="support">Technical Support</option>
+                                        <option value="feedback">Feedback</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="color: var(--text-primary);">Message</label>
+                                    <textarea class="form-control" rows="5" placeholder="Your message..." required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Placeholder -->
+        <div class="card mt-4">
+            <div class="card-body p-0">
+                <div style="height: 300px; background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%); display: flex; align-items: center; justify-content: center;">
+                    <div class="text-center">
+                        <i class="fas fa-map-marked-alt fa-3x mb-3" style="color: var(--primary-color);"></i>
+                        <p style="color: var(--text-secondary);">Interactive Map</p>
+                        <p class="small" style="color: var(--text-muted);">123 Auto Street, Automotive District</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

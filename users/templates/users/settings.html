@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-cog me-2" style="color: var(--primary-color);"></i>Settings
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Appearance -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: var(--text-primary);">Appearance</h6>
+                        <div class="card" style="background: var(--bg-secondary);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width: 45px; height: 45px; background: rgba(107, 33, 168, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas {% if is_dark_mode %}fa-sun{% else %}fa-moon{% endif %}" style="color: var(--primary-color);"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0" style="color: var(--text-primary);">Dark Mode</p>
+                                            <p class="mb-0 small" style="color: var(--text-secondary);">Toggle between light and dark theme</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="themeToggleInput" name="theme" value="dark" {% if is_dark_mode %}checked{% endif %} style="width: 50px; height: 25px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: var(--text-primary);">Notifications</h6>
+                        <div class="card" style="background: var(--bg-secondary);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-envelope" style="color: var(--success-color);"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0" style="color: var(--text-primary);">Email Notifications</p>
+                                            <p class="mb-0 small" style="color: var(--text-secondary);">Receive updates via email</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="emailNotifications" name="email_notifications" {% if profile.email_notifications %}checked{% endif %} style="width: 50px; height: 25px;">
+                                    </div>
+                                </div>
+                                
+                                <hr style="border-color: var(--border-color);">
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width: 45px; height: 45px; background: rgba(245, 158, 11, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-sms" style="color: var(--warning-color);"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0" style="color: var(--text-primary);">SMS Notifications</p>
+                                            <p class="mb-0 small" style="color: var(--text-secondary);">Receive updates via SMS</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="smsNotifications" name="sms_notifications" {% if profile.sms_notifications %}checked{% endif %} style="width: 50px; height: 25px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Security -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: var(--text-primary);">Account Security</h6>
+                        <div class="card" style="background: var(--bg-secondary);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width: 45px; height: 45px; background: rgba(59, 130, 246, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-lock" style="color: var(--info-color);"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0" style="color: var(--text-primary);">Change Password</p>
+                                            <p class="mb-0 small" style="color: var(--text-secondary);">Update your account password</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                        Change
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Settings
+                        </button>
+                        <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div class="card mt-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1" style="color: var(--danger-color);">Delete Account</h6>
+                        <p class="mb-0 small" style="color: var(--text-secondary);">Once deleted, your account cannot be recovered</p>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: var(--card-bg);">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: var(--text-primary);">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-primary);">Current Password</label>
+                        <input type="password" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-primary);">New Password</label>
+                        <input type="password" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-primary);">Confirm New Password</label>
+                        <input type="password" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Update Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: var(--card-bg);">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Delete Account</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-primary);">Are you sure you want to delete your account? This action cannot be undone.</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>All your data will be permanently removed.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" style="color: var(--text-primary);">Type "DELETE" to confirm</label>
+                    <input type="text" class="form-control" placeholder="DELETE">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger">Delete Account</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .form-switch .form-check-input {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 1%29'/%3e%3c/svg%3e");
+    }
+    
+    .form-switch .form-check-input:focus {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 1%29'/%3e%3c/svg%3e");
+    }
+</style>
+
+<script>
+    // Theme toggle in settings
+    document.getElementById('themeToggleInput')?.addEventListener('change', function() {
+        const html = document.documentElement;
+        const newTheme = this.checked ? 'dark' : 'light';
+        
+        html.setAttribute('data-theme', newTheme);
+        document.cookie = `theme=${newTheme};path=/;max-age=31536000`;
+        
+        // Update main toggle icon
+        const mainToggle = document.getElementById('themeToggle');
+        if (mainToggle) {
+            const icon = mainToggle.querySelector('i');
+            icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    });
+</script>
+{% endblock %}

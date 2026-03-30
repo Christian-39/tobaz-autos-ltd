@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}" style="color: var(--primary-color);">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'sales:sale_list' %}" style="color: var(--primary-color);">Sales</a></li>
+        <li class="breadcrumb-item active" style="color: var(--text-secondary);">{{ sale.order_number }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <!-- Sale Info -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0" style="color: var(--text-primary);">
+                        <i class="fas fa-receipt me-2" style="color: var(--primary-color);"></i>{{ sale.order_number }}
+                    </h4>
+                    <small style="color: var(--text-secondary);">{{ sale.created_at|date:"F d, Y H:i" }}</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge 
+                        {% if sale.status == 'completed' %}bg-success
+                        {% elif sale.status == 'pending' %}bg-warning
+                        {% elif sale.status == 'processing' %}bg-info
+                        {% else %}bg-danger{% endif %}" style="font-size: 0.875rem;">
+                        {{ sale.get_status_display }}
+                    </span>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i>Print Invoice
+                            </a></li>
+                            {% if sale.status != 'cancelled' %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'sales:cancel_sale' sale.order_number %}">
+                                <i class="fas fa-times me-2"></i>Cancel Sale
+                            </a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <a href="{{ item.product.get_absolute_url }}" style="color: var(--primary-color);">
+                                        {{ item.product.name }}
+                                    </a>
+                                </td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">${{ item.unit_price }}</td>
+                                <td class="text-end" style="font-weight: 600;">${{ item.total_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot style="background: var(--bg-secondary);">
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                <td class="text-end">${{ sale.subtotal }}</td>
+                            </tr>
+                            {% if sale.tax_amount > 0 %}
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Tax:</strong></td>
+                                <td class="text-end">${{ sale.tax_amount }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if sale.discount_amount > 0 %}
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Discount:</strong></td>
+                                <td class="text-end" style="color: var(--success-color);">-${{ sale.discount_amount }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td colspan="3" class="text-end"><strong style="font-size: 1.125rem;">Total:</strong></td>
+                                <td class="text-end" style="font-size: 1.25rem; font-weight: 700; color: var(--primary-color);">
+                                    ${{ sale.total_amount }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notes -->
+        {% if sale.notes %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-sticky-note me-2" style="color: var(--primary-color);"></i>Notes
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0" style="color: var(--text-secondary);">{{ sale.notes|linebreaks }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Customer Info -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-user me-2" style="color: var(--primary-color);"></i>Customer Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">Name</small>
+                    <p class="mb-0" style="color: var(--text-primary);">
+                        {% if sale.customer %}
+                            {{ sale.customer.get_full_name|default:sale.customer.username }}
+                        {% else %}
+                            {{ sale.customer_name|default:"Walk-in Customer" }}
+                        {% endif %}
+                    </p>
+                </div>
+                
+                {% if sale.customer_email %}
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">Email</small>
+                    <p class="mb-0" style="color: var(--text-primary);">{{ sale.customer_email }}</p>
+                </div>
+                {% endif %}
+                
+                {% if sale.customer_phone %}
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">Phone</small>
+                    <p class="mb-0" style="color: var(--text-primary);">{{ sale.customer_phone }}</p>
+                </div>
+                {% endif %}
+                
+                <hr style="border-color: var(--border-color);">
+                
+                <div class="mb-3">
+                    <small style="color: var(--text-muted);">Payment Method</small>
+                    <p class="mb-0">
+                        <span class="badge bg-secondary">{{ sale.get_payment_method_display }}</span>
+                    </p>
+                </div>
+                
+                <div>
+                    <small style="color: var(--text-muted);">Order Date</small>
+                    <p class="mb-0" style="color: var(--text-primary);">{{ sale.created_at|date:"F d, Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sale Summary -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-chart-pie me-2" style="color: var(--primary-color);"></i>Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span style="color: var(--text-secondary);">Items:</span>
+                    <span style="color: var(--text-primary); font-weight: 500;">{{ sale.item_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span style="color: var(--text-secondary);">Products:</span>
+                    <span style="color: var(--text-primary); font-weight: 500;">{{ items.count }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span style="color: var(--text-secondary);">Status:</span>
+                    <span style="color: var(--text-primary); font-weight: 500;">{{ sale.get_status_display }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <a href="{% url 'sales:create_sale' %}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-plus me-2"></i>Create New Sale
+                </a>
+                <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Sales
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .breadcrumb-item + .breadcrumb-item::before {
+        color: var(--text-muted);
+    }
+    
+    .table thead th {
+        background: var(--bg-secondary);
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    
+    .table tfoot td {
+        border-top: none;
+    }
+    
+    .table tfoot tr:last-child td {
+        border-top: 2px solid var(--border-color);
+    }
+    
+    @media print {
+        .sidebar, .top-navbar, .bottom-nav, .breadcrumb, .btn {
+            display: none !important;
+        }
+        
+        .main-content {
+            margin-left: 0 !important;
+        }
+    }
+</style>
+{% endblock %}

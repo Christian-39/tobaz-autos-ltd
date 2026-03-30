@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Profile Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body text-center p-4">
+                <div class="position-relative d-inline-block mb-3">
+                    {% if profile.profile_image %}
+                        <img src="{{ profile.profile_image.url }}" alt="{{ user.username }}" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background: var(--primary-color); margin: 0 auto;">
+                            <span class="text-white" style="font-size: 3rem; font-weight: 600;">
+                                {{ user.first_name|first|default:user.username|first|upper }}
+                            </span>
+                        </div>
+                    {% endif %}
+                    <a href="{% url 'users:edit_profile' %}" class="btn btn-sm btn-primary position-absolute" style="bottom: 0; right: 0; border-radius: 50%; width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-camera"></i>
+                    </a>
+                </div>
+                
+                <h4 class="mb-1" style="color: var(--text-primary);">{{ profile.full_name }}</h4>
+                <p class="mb-2" style="color: var(--text-secondary);">@{{ user.username }}</p>
+                <span class="badge mb-3" style="background: rgba(107, 33, 168, 0.1); color: var(--primary-color);">
+                    {{ profile.get_user_type_display }}
+                </span>
+                
+                {% if profile.bio %}
+                <p class="mb-3" style="color: var(--text-secondary);">{{ profile.bio }}</p>
+                {% endif %}
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'users:edit_profile' %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'users:settings' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="card mt-4">
+            <div class="card-body p-4">
+                <h6 class="mb-3" style="color: var(--text-primary);">Contact Information</h6>
+                
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div style="width: 35px; height: 35px; background: rgba(107, 33, 168, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-envelope" style="color: var(--primary-color); font-size: 0.875rem;"></i>
+                    </div>
+                    <div>
+                        <small style="color: var(--text-muted);">Email</small>
+                        <p class="mb-0" style="color: var(--text-primary); font-size: 0.875rem;">{{ user.email }}</p>
+                    </div>
+                </div>
+                
+                {% if profile.phone %}
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div style="width: 35px; height: 35px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-phone" style="color: var(--success-color); font-size: 0.875rem;"></i>
+                    </div>
+                    <div>
+                        <small style="color: var(--text-muted);">Phone</small>
+                        <p class="mb-0" style="color: var(--text-primary); font-size: 0.875rem;">{{ profile.phone }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if profile.city or profile.country %}
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 35px; height: 35px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-map-marker-alt" style="color: var(--warning-color); font-size: 0.875rem;"></i>
+                    </div>
+                    <div>
+                        <small style="color: var(--text-muted);">Location</small>
+                        <p class="mb-0" style="color: var(--text-primary); font-size: 0.875rem;">
+                            {% if profile.city %}{{ profile.city }}{% endif %}
+                            {% if profile.city and profile.country %}, {% endif %}
+                            {% if profile.country %}{{ profile.country }}{% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Content -->
+    <div class="col-lg-8">
+        <!-- Stats Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-2" style="width: 50px; height: 50px; background: rgba(107, 33, 168, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-shopping-cart" style="color: var(--primary-color);"></i>
+                        </div>
+                        <h4 class="mb-1" style="color: var(--text-primary);">0</h4>
+                        <p class="mb-0 small" style="color: var(--text-secondary);">Total Orders</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-2" style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-dollar-sign" style="color: var(--success-color);"></i>
+                        </div>
+                        <h4 class="mb-1" style="color: var(--text-primary);">$0</h4>
+                        <p class="mb-0 small" style="color: var(--text-secondary);">Total Spent</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-2" style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-calendar" style="color: var(--warning-color);"></i>
+                        </div>
+                        <h4 class="mb-1" style="color: var(--text-primary);">{{ user.date_joined|date:"M Y" }}</h4>
+                        <p class="mb-0 small" style="color: var(--text-secondary);">Member Since</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Address -->
+        {% if profile.address %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-home me-2" style="color: var(--primary-color);"></i>Address
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0" style="color: var(--text-secondary);">{{ profile.address|linebreaks }}</p>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" style="color: var(--text-primary);">
+                    <i class="fas fa-history me-2" style="color: var(--primary-color);"></i>Recent Activity
+                </h5>
+                <a href="{% url 'sales:sale_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x mb-3" style="color: var(--text-muted);"></i>
+                    <p style="color: var(--text-secondary);">No recent activity</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
