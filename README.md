@@ -7,6 +7,7 @@ A complete, production-ready web application for managing an auto parts and vehi
 ## Features
 
 ### Products Management
+
 - **Categories**: Small Cars, Auto Parts, Tools, Oil
 - **Multiple Images Upload**: Support for multiple product images with primary image selection
 - **Multiple Videos Upload**: Support for multiple product videos
@@ -15,6 +16,7 @@ A complete, production-ready web application for managing an auto parts and vehi
 - **Stock Status**: Automatic stock tracking (In Stock, Low Stock, Out of Stock)
 
 ### Admin Dashboard
+
 - Add, edit, delete products
 - Track quantity, sales, and inventory levels
 - View product media (images/videos)
@@ -22,6 +24,7 @@ A complete, production-ready web application for managing an auto parts and vehi
 - Statistics and analytics
 
 ### Inventory Management
+
 - Real-time stock tracking
 - Product categories management
 - Quantity updates when sales happen
@@ -29,6 +32,7 @@ A complete, production-ready web application for managing an auto parts and vehi
 - Inventory valuation
 
 ### Sales System
+
 - Record sales with multiple products
 - Automatic stock reduction
 - Track total sales and revenue
@@ -37,6 +41,7 @@ A complete, production-ready web application for managing an auto parts and vehi
 - Order status management (Pending, Processing, Completed, Cancelled)
 
 ### Users & Profiles
+
 - User authentication (login/register/logout)
 - Profile page with image upload
 - User types (Customer, Staff, Admin)
@@ -44,17 +49,20 @@ A complete, production-ready web application for managing an auto parts and vehi
 - Notification preferences
 
 ### Settings
+
 - Dark/Light mode toggle
 - User preferences storage
 - Theme persistence across sessions
 
 ### Search & Filter
+
 - Search products by name, SKU, description
 - Filter by category and product type
 - Sort by price, name, date
 - Pagination support
 
 ### Responsive Design
+
 - Desktop: Sidebar navigation (left)
 - Mobile/Tablet: Bottom navigation bar
 - 100% responsive layout
@@ -125,6 +133,7 @@ tobaz_autos/
 ## Installation
 
 ### Prerequisites
+
 - Python 3.8+
 - MySQL (optional, SQLite works for development)
 - pip
@@ -157,11 +166,13 @@ pip install -r requirements.txt
 ### Step 4: Database Setup
 
 #### Option A: Using SQLite (Development)
+
 The project is already configured to use SQLite for development. No additional setup needed.
 
 #### Option B: Using MySQL (Production)
 
 1. Create a MySQL database:
+
 ```sql
 CREATE DATABASE tobaz_autos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'tobaz_user'@'localhost' IDENTIFIED BY 'your_password';
@@ -170,6 +181,7 @@ FLUSH PRIVILEGES;
 ```
 
 2. Update database settings in `tobaz_autos/settings.py`:
+
 ```python
 DATABASES = {
     'default': {
@@ -184,6 +196,7 @@ DATABASES = {
 ```
 
 Or use environment variables:
+
 ```bash
 export DB_NAME=tobaz_autos
 export DB_USER=tobaz_user
@@ -224,6 +237,7 @@ Visit `http://127.0.0.1:8000/` in your browser.
 ### Step 1: Prepare for Deployment
 
 1. Create a `build.sh` script:
+
 ```bash
 #!/usr/bin/env bash
 set -o errexit
@@ -235,11 +249,13 @@ python manage.py migrate
 ```
 
 2. Make it executable:
+
 ```bash
 chmod +x build.sh
 ```
 
 3. Create a `render.yaml` file:
+
 ```yaml
 services:
   - type: web
@@ -281,41 +297,46 @@ services:
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DJANGO_SECRET_KEY` | Django secret key | Generate new for production |
-| `DJANGO_DEBUG` | Debug mode | `False` for production |
-| `DJANGO_ALLOWED_HOSTS` | Allowed hosts | `localhost,127.0.0.1` |
-| `DB_NAME` | Database name | `tobaz_autos` |
-| `DB_USER` | Database user | `root` |
-| `DB_PASSWORD` | Database password | `` |
-| `DB_HOST` | Database host | `localhost` |
-| `DB_PORT` | Database port | `3306` |
-| `USE_SQLITE` | Use SQLite instead of MySQL | `False` |
+| Variable               | Description                 | Default                     |
+| ---------------------- | --------------------------- | --------------------------- |
+| `DJANGO_SECRET_KEY`    | Django secret key           | Generate new for production |
+| `DJANGO_DEBUG`         | Debug mode                  | `False` for production      |
+| `DJANGO_ALLOWED_HOSTS` | Allowed hosts               | `localhost,127.0.0.1`       |
+| `DB_NAME`              | Database name               | `tobaz_autos`               |
+| `DB_USER`              | Database user               | `root`                      |
+| `DB_PASSWORD`          | Database password           | ``                          |
+| `DB_HOST`              | Database host               | `localhost`                 |
+| `DB_PORT`              | Database port               | `3306`                      |
+| `USE_SQLITE`           | Use SQLite instead of MySQL | `False`                     |
 
 ## Usage
 
 ### Admin Panel
+
 - Access: `/admin/`
 - Login with superuser credentials
 - Manage all models from the admin interface
 
 ### Dashboard
+
 - Access: `/dashboard/`
 - View statistics and recent activity
 - Quick actions for common tasks
 
 ### Products
+
 - List: `/products/`
 - Detail: `/products/<slug>/`
 - Search and filter functionality
 
 ### Sales
+
 - List: `/sales/`
 - Create: `/sales/create/`
 - Reports: `/sales/report/`
 
 ### User Profile
+
 - Profile: `/users/profile/`
 - Settings: `/users/settings/`
 - Edit Profile: `/users/profile/edit/`
@@ -350,6 +371,7 @@ def divide(value, arg):
 ## API Endpoints
 
 ### Sales
+
 - `GET /sales/api/product-price/<product_id>/` - Get product price (AJAX)
 
 ## Security Features
