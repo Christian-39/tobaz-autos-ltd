@@ -15,7 +15,7 @@
       {{ total_results }} categories found
     </p>
   </div>
-  <a href="{% url 'dashboard:add_product' %}" class="btn btn-primary">
+  <a href="{% url 'dashboard:add_category' %}" class="btn btn-primary">
     <i class="fas fa-plus me-2"></i>Add Category
   </a>
 </div>
@@ -115,7 +115,7 @@
         <p style="color: var(--text-secondary)">
           Try a different search term or add a new category.
         </p>
-        <a href="{% url 'dashboard:add_product' %}" class="btn btn-primary">
+        <a href="{% url 'dashboard:add_category' %}" class="btn btn-primary">
           <i class="fas fa-plus me-2"></i>Add New Category
         </a>
       </div>
