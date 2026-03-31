@@ -132,6 +132,10 @@
             height: 40px;
             border-radius: 8px;
         }
+
+        .sidebar-brand span{
+            font-size: 1rem;
+        }
         
         .sidebar-nav {
             padding: 1rem 0;
@@ -608,11 +612,15 @@
 <body>
     <!-- Sidebar (Desktop) -->
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <a href="{% url 'core:home' %}">
-                <img src="/static/images/logo.png" alt="Tobaz Autos">
+        <div class="sidebar-brand d-flex justify-content-between align-items-start">
+            <a href="{% url 'core:home' %}" class="d-flex align-items-center gap-2">
+                <img src="/static/images/tobaz.jpeg" alt="Tobaz Autos">
                 <span>Tobaz Autos</span>
             </a>
+            
+            <button class="btn-icon d-lg-none" id="sidebarClose" style="background: transparent; border: none; color: white; margin-top: -5px; margin-right: -10px;">
+                <i class="fas fa-times" style="font-size: 1.25rem;"></i>
+            </button>
         </div>
         
         <nav class="sidebar-nav">
@@ -622,8 +630,8 @@
             </a>
             
             <div class="sidebar-section-title">Products</div>
-            <a href="{% url 'products:category_detail' %}" class="sidebar-nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-box"></i>
+            <a href="{% url 'products:category_list' %}" class="sidebar-nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-th-large"></i>
                 <span>Category Lists</span>
             </a>
             <a href="{% url 'products:product_list' %}" class="sidebar-nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
@@ -678,7 +686,7 @@
             </a>
         </nav>
     </aside>
-    
+    <div id="sidebarOverlay" class="d-lg-none" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;"></div>
     <!-- Main Content -->
     <main class="main-content">
         <!-- Top Navbar -->
@@ -781,9 +789,42 @@
         });
         
         // Sidebar Toggle (Mobile)
-        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('show');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            const isOpen = sidebar.classList.toggle('show');
+            sidebarOverlay.style.display = isOpen ? 'block' : 'none';
+            // Prevent body scroll when sidebar is open on mobile
+            document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+        }
+
+        // Open sidebar
+        sidebarToggle?.addEventListener('click', toggleSidebar);
+
+        // Close sidebar (via X button or clicking overlay)
+        [sidebarClose, sidebarOverlay].forEach(el => {
+            el?.addEventListener('click', toggleSidebar);
         });
+
+        // Close sidebar when a nav link is clicked (useful for single-page feel)
+        document.querySelectorAll('.sidebar-nav-item').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 992) {
+                    toggleSidebar();
+                }
+            });
+        });
+
+        // Close sidebar on scroll outside (Optional - usually Overlay click is better)
+        window.addEventListener('scroll', () => {
+            if (sidebar.classList.contains('show') && window.innerWidth < 992) {
+                // Only auto-close if scrolled significantly
+                if(window.scrollY > 50) toggleSidebar();
+            }
+        }, { passive: true });
         
         // Auto-hide alerts after 5 seconds
         setTimeout(function() {

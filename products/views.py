@@ -87,6 +87,36 @@ def product_detail(request, slug):
     return render(request, 'products/product_detail.html', context)
 
 
+def category_list(request):
+    """
+    Category list view displaying all active product categories.
+    """
+    # Fetch all active categories
+    categories = Category.objects.filter(is_active=True).order_by('name')
+    
+    # Search functionality within categories (optional, but helpful)
+    search_query = request.GET.get('q', '')
+    if search_query:
+        categories = categories.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    # Pagination for categories (in case you have many)
+    paginator = Paginator(categories, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'categories': page_obj,
+        'search_query': search_query,
+        'total_results': categories.count(),
+        'title': 'Product Categories - Tobaz Autos',
+        'meta_description': 'Explore our wide range of automotive categories including spare parts, oils, tools, and vehicles.',
+    }
+    return render(request, 'products/category_list.html', context)
+    
+
 def category_detail(request, slug):
     """
     Category detail view showing products in a specific category.
