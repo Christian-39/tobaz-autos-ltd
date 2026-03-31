@@ -622,6 +622,10 @@
             </a>
             
             <div class="sidebar-section-title">Products</div>
+            <a href="{% url 'products:category_detail' %}" class="sidebar-nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-box"></i>
+                <span>Category Lists</span>
+            </a>
             <a href="{% url 'products:product_list' %}" class="sidebar-nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-box"></i>
                 <span>All Products</span>
