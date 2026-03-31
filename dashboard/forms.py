@@ -24,6 +24,33 @@ class ProductForm(forms.ModelForm):
         self.fields['category'].queryset = Category.objects.filter(is_active=True)
 
 
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        # We exclude 'slug' because your model's save() method handles it
+        fields = ['name', 'icon', 'description', 'is_active']
+        
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'e.g. Engine Parts'
+            }),
+            'icon': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'fas fa-car'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 4, 
+                'placeholder': 'Briefly describe this category'
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
+
+
 class ProductImageForm(forms.Form):
     """
     Form for adding product images.

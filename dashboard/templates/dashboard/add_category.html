@@ -1,0 +1,142 @@
+{% extends 'base.html' %} {% block title %}{{ title }}{% endblock %}
+<!-- prettier-ignore -->
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1" style="color: var(--text-primary)">Add New Category</h1>
+    <p class="mb-0" style="color: var(--text-secondary)">
+      Create a new classification for your products
+    </p>
+  </div>
+  <a
+    href="{% url 'dashboard:product_management' %}"
+    class="btn btn-outline-secondary"
+  >
+    <i class="fas fa-arrow-left me-2"></i>Back to Products
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <form method="post" id="categoryForm">
+      {% csrf_token %}
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0" style="color: var(--text-primary)">
+            <i class="fas fa-tags me-2" style="color: var(--primary-color)"></i
+            >Category Details
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label" for="{{ form.name.id_for_label }}">
+                Category Name <span class="text-danger">*</span>
+              </label>
+              {{ form.name }} {% if form.name.errors %}
+              <div class="text-danger small">{{ form.name.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.icon.id_for_label }}"
+                >Icon Class</label
+              >
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-icons"></i
+                ></span>
+                {{ form.icon }}
+              </div>
+              <div class="form-text small">e.g., fas fa-car</div>
+            </div>
+
+            <div class="col-12">
+              <label
+                class="form-label"
+                for="{{ form.description.id_for_label }}"
+                >Description</label
+              >
+              {{ form.description }} {% if form.description.errors %}
+              <div class="text-danger small">{{ form.description.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <div class="form-check form-switch">
+                {{ form.is_active }}
+                <label
+                  class="form-check-label"
+                  for="{{ form.is_active.id_for_label }}"
+                  style="color: var(--text-primary)"
+                  >Active Status</label
+                >
+                <div class="form-text">
+                  Inactive categories will be hidden from the public store.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-3 mb-4">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-2"></i>Create Category
+        </button>
+        <a
+          href="{% url 'dashboard:product_management' %}"
+          class="btn btn-outline-secondary"
+        >
+          <i class="fas fa-times me-2"></i>Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-header">
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i
+            class="fas fa-lightbulb me-2"
+            style="color: var(--warning-color)"
+          ></i
+          >Category Tips
+        </h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled mb-0">
+          <li class="mb-3 d-flex align-items-start">
+            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+            <span style="color: var(--text-secondary)"
+              >Keep names concise and professional.</span
+            >
+          </li>
+          <li class="mb-3 d-flex align-items-start">
+            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+            <span style="color: var(--text-secondary)"
+              >The icon class allows you to set unique icons for each
+              category.</span
+            >
+          </li>
+          <li class="mb-3 d-flex align-items-start">
+            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+            <span style="color: var(--text-secondary)"
+              >Inactive categories won't show in the dropdown when adding
+              products.</span
+            >
+          </li>
+          <li class="d-flex align-items-start">
+            <i class="fas fa-info-circle text-info mt-1 me-2"></i>
+            <span style="color: var(--text-secondary)"
+              >Slugs are generated automatically from the name.</span
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,278 +1,339 @@
-{% extends 'base.html' %}
-
-{% block title %}{{ title }}{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}{{ title }}{% endblock %}
+<!-- prettier-ignore -->
+{% load humanize %} {% block content %}
 <!-- Welcome Section -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-1" style="color: var(--text-primary);">Dashboard</h1>
-        <p class="mb-0" style="color: var(--text-secondary);">Welcome back, {{ user.first_name|default:user.username }}! Here's what's happening today.</p>
-    </div>
-    <a href="{% url 'sales:create_sale' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>New Sale
-    </a>
+  <div>
+    <h1 class="h3 mb-1" style="color: var(--text-primary)">Dashboard</h1>
+    <p class="mb-0" style="color: var(--text-secondary)">
+      Welcome back, {{ user.first_name|default:user.username }}! Here's what's
+      happening today.
+    </p>
+  </div>
+  <a href="{% url 'sales:create_sale' %}" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>New Sale
+  </a>
 </div>
 
 <!-- Statistics Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="stat-icon primary">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stat-value">{{ total_products }}</div>
-            <div class="stat-label">Total Products</div>
-        </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon primary">
+        <i class="fas fa-box"></i>
+      </div>
+      <div class="stat-value">{{ total_products }}</div>
+      <div class="stat-label">Total Products</div>
     </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="stat-icon warning">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="stat-value">{{ low_stock_products }}</div>
-            <div class="stat-label">Low Stock Items</div>
-        </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon warning">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="stat-value">{{ low_stock_products }}</div>
+      <div class="stat-label">Low Stock Items</div>
     </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="stat-icon danger">
-                <i class="fas fa-times-circle"></i>
-            </div>
-            <div class="stat-value">{{ out_of_stock_products }}</div>
-            <div class="stat-label">Out of Stock</div>
-        </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon danger">
+        <i class="fas fa-times-circle"></i>
+      </div>
+      <div class="stat-value">{{ out_of_stock_products }}</div>
+      <div class="stat-label">Out of Stock</div>
     </div>
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="stat-icon success">
-                <i class="fas fa-shopping-cart"></i>
-            </div>
-            <div class="stat-value">{{ total_sales }}</div>
-            <div class="stat-label">Total Sales</div>
-        </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon success">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="stat-value">{{ total_sales }}</div>
+      <div class="stat-label">Total Sales</div>
     </div>
+  </div>
 </div>
 
 <div class="row g-4">
-    <!-- Recent Sales -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0" style="color: var(--text-primary);">
-                    <i class="fas fa-history me-2" style="color: var(--primary-color);"></i>Recent Sales
-                </h5>
-                <a href="{% url 'sales:sale_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Order #</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for sale in recent_sales %}
-                            <tr>
-                                <td>
-                                    <a href="{% url 'sales:sale_detail' sale.order_number %}" style="color: var(--primary-color); font-weight: 500;">
-                                        {{ sale.order_number }}
-                                    </a>
-                                </td>
-                                <td>
-                                    {% if sale.customer %}
-                                        {{ sale.customer.get_full_name|default:sale.customer.username }}
-                                    {% else %}
-                                        {{ sale.customer_name|default:"Walk-in" }}
-                                    {% endif %}
-                                </td>
-                                <td style="color: var(--text-secondary);">{{ sale.created_at|date:"M d, Y" }}</td>
-                                <td style="color: var(--primary-color); font-weight: 600;">${{ sale.total_amount }}</td>
-                                <td>
-                                    <span class="badge 
-                                        {% if sale.status == 'completed' %}bg-success
-                                        {% elif sale.status == 'pending' %}bg-warning
-                                        {% elif sale.status == 'processing' %}bg-info
-                                        {% else %}bg-danger{% endif %}">
-                                        {{ sale.get_status_display }}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center py-4">
-                                    <i class="fas fa-shopping-cart mb-2" style="color: var(--text-muted);"></i>
-                                    <p class="mb-0" style="color: var(--text-secondary);">No recent sales</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <!-- Recent Sales -->
+  <div class="col-lg-8">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i class="fas fa-history me-2" style="color: var(--primary-color)"></i
+          >Recent Sales
+        </h5>
+        <a
+          href="{% url 'sales:sale_list' %}"
+          class="btn btn-sm btn-outline-primary"
+          >View All</a
+        >
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sale in recent_sales %}
+              <tr>
+                <td>
+                  <a
+                    href="{% url 'sales:sale_detail' sale.order_number %}"
+                    style="color: var(--primary-color); font-weight: 500"
+                  >
+                    {{ sale.order_number }}
+                  </a>
+                </td>
+                <td>
+                  <!-- prettier-ignore -->
+                  {% if sale.customer %} {{ sale.customer.get_full_name|default:sale.customer.username }} {% else %} {{ sale.customer_name|default:"Walk-in" }} {% endif %}
+                </td>
+                <td style="color: var(--text-secondary)">
+                  {{ sale.created_at|date:"M d, Y" }}
+                </td>
+                <td style="color: var(--primary-color); font-weight: 600">
+                  ${{ sale.total_amount }}
+                </td>
+                <td>
+                  <!-- prettier-ignore -->
+                  <span class="badge {% if sale.status == 'completed' %}bg-success {% elif sale.status == 'pending' %}bg-warning {% elif sale.status == 'processing' %}bg-info {% else %}bg-danger{% endif %}">
+                    {{ sale.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <i
+                    class="fas fa-shopping-cart mb-2"
+                    style="color: var(--text-muted)"
+                  ></i>
+                  <p class="mb-0" style="color: var(--text-secondary)">
+                    No recent sales
+                  </p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-        
-        <!-- Top Products -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0" style="color: var(--text-primary);">
-                    <i class="fas fa-trophy me-2" style="color: var(--primary-color);"></i>Top Selling Products
-                </h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th class="text-center">Sold</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for product in top_products %}
-                            <tr>
-                                <td style="color: var(--text-primary);">{{ product.product__name }}</td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary">{{ product.total_sold }}</span>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="2" class="text-center py-4">
-                                    <p class="mb-0" style="color: var(--text-secondary);">No sales data available</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    
-    <!-- Low Stock Alert -->
-    <div class="col-lg-4">
-        <div class="card border-warning">
-            <div class="card-header bg-warning text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Low Stock Alert
-                </h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    {% for product in low_stock %}
-                    <a href="{% url 'dashboard:edit_product' product.slug %}" class="list-group-item list-group-item-action">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1" style="color: var(--text-primary);">{{ product.name|truncatechars:25 }}</h6>
-                                <small style="color: var(--text-secondary);">{{ product.category.name }}</small>
-                            </div>
-                            <span class="badge {% if product.quantity == 0 %}bg-danger{% else %}bg-warning{% endif %}">
-                                {{ product.quantity }} left
-                            </span>
-                        </div>
-                    </a>
-                    {% empty %}
-                    <div class="list-group-item text-center py-4">
-                        <i class="fas fa-check-circle fa-2x mb-2" style="color: var(--success-color);"></i>
-                        <p class="mb-0" style="color: var(--text-secondary);">All products are well stocked!</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'dashboard:inventory' %}" class="btn btn-outline-warning w-100">
-                    <i class="fas fa-warehouse me-2"></i>Manage Inventory
-                </a>
-            </div>
+
+    <!-- Top Products -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i class="fas fa-trophy me-2" style="color: var(--primary-color)"></i
+          >Top Selling Products
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th class="text-center">Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in top_products %}
+              <tr>
+                <td style="color: var(--text-primary)">
+                  {{ product.product__name }}
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-primary">{{ product.total_sold }}</span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="2" class="text-center py-4">
+                  <p class="mb-0" style="color: var(--text-secondary)">
+                    No sales data available
+                  </p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-        
-        <!-- Quick Actions -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0" style="color: var(--text-primary);">
-                    <i class="fas fa-bolt me-2" style="color: var(--primary-color);"></i>Quick Actions
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{% url 'dashboard:add_product' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-plus me-2"></i>Add Product
-                    </a>
-                    <a href="{% url 'sales:create_sale' %}" class="btn btn-outline-success">
-                        <i class="fas fa-cash-register me-2"></i>Create Sale
-                    </a>
-                    <a href="{% url 'sales:sales_report' %}" class="btn btn-outline-info">
-                        <i class="fas fa-chart-bar me-2"></i>View Reports
-                    </a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Low Stock Alert -->
+  <div class="col-lg-4">
+    <div class="card border-warning">
+      <div class="card-header bg-warning text-white">
+        <h5 class="mb-0">
+          <i class="fas fa-exclamation-triangle me-2"></i>Low Stock Alert
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          {% for product in low_stock %}
+          <a
+            href="{% url 'dashboard:edit_product' product.slug %}"
+            class="list-group-item list-group-item-action"
+          >
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1" style="color: var(--text-primary)">
+                  {{ product.name|truncatechars:25 }}
+                </h6>
+                <small style="color: var(--text-secondary)"
+                  >{{ product.category.name }}</small
+                >
+              </div>
+              <span
+                class="badge {% if product.quantity == 0 %}bg-danger{% else %}bg-warning{% endif %}"
+              >
+                {{ product.quantity }} left
+              </span>
+            </div>
+          </a>
+          {% empty %}
+          <div class="list-group-item text-center py-4">
+            <i
+              class="fas fa-check-circle fa-2x mb-2"
+              style="color: var(--success-color)"
+            ></i>
+            <p class="mb-0" style="color: var(--text-secondary)">
+              All products are well stocked!
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card-footer">
+        <a
+          href="{% url 'dashboard:inventory' %}"
+          class="btn btn-outline-warning w-100"
+        >
+          <i class="fas fa-warehouse me-2"></i>Manage Inventory
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i class="fas fa-bolt me-2" style="color: var(--primary-color)"></i
+          >Quick Actions
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a
+            href="{% url 'dashboard:add_category' %}"
+            class="btn btn-outline-secondary"
+          >
+            <i class="fas fa-tags me-2"></i>Create Category
+          </a>
+          <a
+            href="{% url 'dashboard:add_product' %}"
+            class="btn btn-outline-primary"
+          >
+            <i class="fas fa-plus me-2"></i>Add Product
+          </a>
+          <a
+            href="{% url 'sales:create_sale' %}"
+            class="btn btn-outline-success"
+          >
+            <i class="fas fa-cash-register me-2"></i>Create Sale
+          </a>
+          <a href="{% url 'sales:sales_report' %}" class="btn btn-outline-info">
+            <i class="fas fa-chart-bar me-2"></i>View Reports
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-    .stat-card {
-        padding: 1.5rem;
-        border-radius: 12px;
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-icon.primary { background: rgba(107, 33, 168, 0.1); color: var(--primary-color); }
-    .stat-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
-    .stat-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
-    .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
-    
-    .stat-value {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-    
-    .table thead th {
-        background: var(--bg-secondary);
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-    }
-    
-    .list-group-item {
-        background: var(--card-bg);
-        border-color: var(--border-color);
-    }
-    
-    .list-group-item:hover {
-        background: var(--bg-secondary);
-    }
+  .stat-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon.primary {
+    background: rgba(107, 33, 168, 0.1);
+    color: var(--primary-color);
+  }
+  .stat-icon.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+  }
+  .stat-icon.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+  }
+  .stat-icon.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+  }
+
+  .stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .table thead th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .list-group-item {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+  }
+
+  .list-group-item:hover {
+    background: var(--bg-secondary);
+  }
 </style>
 {% endblock %}

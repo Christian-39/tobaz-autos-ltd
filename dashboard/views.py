@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from products.models import Product, Category, ProductImage, ProductVideo
 from sales.models import Sale, SaleItem
 from users.models import Profile
-from .forms import ProductForm, ProductImageFormSet, ProductVideoFormSet
+from .forms import ProductForm, ProductImageFormSet, ProductVideoFormSet, CategoryForm
 
 
 @login_required
@@ -51,6 +51,28 @@ def dashboard(request):
         'title': 'Dashboard - Tobaz Autos',
     }
     return render(request, 'dashboard/dashboard.html', context)
+
+
+@login_required
+def add_category(request):
+    if not request.user.profile.user_type in ['staff', 'admin']:
+        messages.error(request, 'Access Denied.')
+        return redirect('dashboard:dashboard')
+
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save() # This triggers your model's save() and creates the slug
+            messages.success(request, f'Category "{category.name}" created successfully!')
+            return redirect('dashboard:product_management')
+    else:
+        form = CategoryForm()
+
+    context = {
+        'form': form,
+        'title': 'Add Category - Tobaz Autos',
+    }
+    return render(request, 'dashboard/add_category.html', context)
 
 
 @login_required

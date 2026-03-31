@@ -1,276 +1,367 @@
-{% extends 'base.html' %}
-
-{% block title %}{{ title }}{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}{{ title }}{% endblock %}
+<!-- prettier-ignore -->
+{% load humanize %} {% block content %}
 <!-- Page Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-1" style="color: var(--text-primary);">Sales</h1>
-        <p class="mb-0" style="color: var(--text-secondary);">Manage and track all sales</p>
-    </div>
-    <a href="{% url 'sales:create_sale' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>New Sale
-    </a>
+  <div>
+    <h1 class="h3 mb-1" style="color: var(--text-primary)">Sales</h1>
+    <p class="mb-0" style="color: var(--text-secondary)">
+      Manage and track all sales
+    </p>
+  </div>
+  <a href="{% url 'sales:create_sale' %}" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>New Sale
+  </a>
 </div>
 
 <!-- Stats Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon primary">
-                <i class="fas fa-shopping-cart"></i>
-            </div>
-            <div class="stat-value">{{ total_sales }}</div>
-            <div class="stat-label">Total Sales</div>
-        </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon primary">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="stat-value">{{ total_sales }}</div>
+      <div class="stat-label">Total Sales</div>
     </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon success">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-value">${{ total_revenue|floatformat:2 }}</div>
-            <div class="stat-label">Total Revenue</div>
-        </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon success">
+        <i class="fas fa-dollar-sign"></i>
+      </div>
+      <div class="stat-value">${{ total_revenue|floatformat:2|intcomma }}</div>
+      <div class="stat-label">Total Revenue</div>
     </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon info">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="stat-value">${{ total_revenue|default:0|div:total_sales|default:1|floatformat:2 }}</div>
-            <div class="stat-label">Average Sale</div>
-        </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon info">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-value">${{ average_sale|floatformat:2|intcomma }}</div>
+      <div class="stat-label">Average Sale</div>
     </div>
+  </div>
 </div>
 
 <!-- Filters -->
 <div class="card mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label small" style="color: var(--text-secondary);">Search</label>
-                <div class="input-group">
-                    <span class="input-group-text" style="background: var(--bg-secondary);">
-                        <i class="fas fa-search" style="color: var(--text-muted);"></i>
-                    </span>
-                    <input type="text" name="q" class="form-control" placeholder="Order number, customer..." value="{{ search|default:'' }}">
-                </div>
-            </div>
-            
-            <div class="col-md-3">
-                <label class="form-label small" style="color: var(--text-secondary);">Status</label>
-                <select name="status" class="form-select" onchange="this.form.submit()">
-                    <option value="">All Status</option>
-                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
-                    <option value="processing" {% if status == 'processing' %}selected{% endif %}>Processing</option>
-                    <option value="completed" {% if status == 'completed' %}selected{% endif %}>Completed</option>
-                    <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                </select>
-            </div>
-            
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-filter me-2"></i>Filter
-                </button>
-            </div>
-            
-            <div class="col-md-2">
-                <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary w-100">
-                    <i class="fas fa-times me-2"></i>Clear
-                </a>
-            </div>
-        </form>
-    </div>
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small" style="color: var(--text-secondary)"
+          >Search</label
+        >
+        <div class="input-group">
+          <span
+            class="input-group-text"
+            style="background: var(--bg-secondary)"
+          >
+            <i class="fas fa-search" style="color: var(--text-muted)"></i>
+          </span>
+          <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Order number, customer..."
+            value="{{ search|default:'' }}"
+          />
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label small" style="color: var(--text-secondary)"
+          >Status</label
+        >
+        <select name="status" class="form-select" onchange="this.form.submit()">
+          <option value="">All Status</option>
+          <option
+            value="pending"
+            {%
+            if
+            status=""
+            ="pending"
+            %}selected{%
+            endif
+            %}
+          >
+            Pending
+          </option>
+          <option
+            value="processing"
+            {%
+            if
+            status=""
+            ="processing"
+            %}selected{%
+            endif
+            %}
+          >
+            Processing
+          </option>
+          <option
+            value="completed"
+            {%
+            if
+            status=""
+            ="completed"
+            %}selected{%
+            endif
+            %}
+          >
+            Completed
+          </option>
+          <option
+            value="cancelled"
+            {%
+            if
+            status=""
+            ="cancelled"
+            %}selected{%
+            endif
+            %}
+          >
+            Cancelled
+          </option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="fas fa-filter me-2"></i>Filter
+        </button>
+      </div>
+
+      <div class="col-md-2">
+        <a
+          href="{% url 'sales:sale_list' %}"
+          class="btn btn-outline-secondary w-100"
+        >
+          <i class="fas fa-times me-2"></i>Clear
+        </a>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Sales Table -->
 <div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Order #</th>
-                        <th>Customer</th>
-                        <th>Date</th>
-                        <th>Items</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Payment</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sale in sales %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'sales:sale_detail' sale.order_number %}" style="color: var(--primary-color); font-weight: 500;">
-                                {{ sale.order_number }}
-                            </a>
-                        </td>
-                        <td>
-                            {% if sale.customer %}
-                                {{ sale.customer.get_full_name|default:sale.customer.username }}
-                            {% else %}
-                                {{ sale.customer_name|default:"Walk-in Customer" }}
-                            {% endif %}
-                        </td>
-                        <td style="color: var(--text-secondary);">{{ sale.created_at|date:"M d, Y" }}</td>
-                        <td>{{ sale.item_count }}</td>
-                        <td style="color: var(--primary-color); font-weight: 600;">${{ sale.total_amount }}</td>
-                        <td>
-                            <span class="badge 
-                                {% if sale.status == 'completed' %}bg-success
-                                {% elif sale.status == 'pending' %}bg-warning
-                                {% elif sale.status == 'processing' %}bg-info
-                                {% else %}bg-danger{% endif %}">
-                                {{ sale.get_status_display }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary">{{ sale.get_payment_method_display }}</span>
-                        </td>
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item" href="{% url 'sales:sale_detail' sale.order_number %}">
-                                            <i class="fas fa-eye me-2"></i>View Details
-                                        </a>
-                                    </li>
-                                    {% if sale.status != 'cancelled' %}
-                                    <li>
-                                        <a class="dropdown-item text-danger" href="{% url 'sales:cancel_sale' sale.order_number %}">
-                                            <i class="fas fa-times me-2"></i>Cancel
-                                        </a>
-                                    </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <i class="fas fa-shopping-cart fa-3x mb-3" style="color: var(--text-muted);"></i>
-                            <p style="color: var(--text-secondary);">No sales found</p>
-                            <a href="{% url 'sales:create_sale' %}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus me-2"></i>Create Sale
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sale in sales %}
+          <tr>
+            <td>
+              <a
+                href="{% url 'sales:sale_detail' sale.order_number %}"
+                style="color: var(--primary-color); font-weight: 500"
+              >
+                {{ sale.order_number }}
+              </a>
+            </td>
+            <td>
+              <!-- prettier-ignore -->
+              {% if sale.customer %} {{ sale.customer.get_full_name|default:sale.customer.username }} {% else %} {{ sale.customer_name|default:"Walk-in Customer" }} {% endif %}
+            </td>
+            <td style="color: var(--text-secondary)">
+              {{ sale.created_at|date:"M d, Y" }}
+            </td>
+            <td>{{ sale.item_count }}</td>
+            <td style="color: var(--primary-color); font-weight: 600">
+              ${{ sale.total_amount }}
+            </td>
+            <td>
+              <span
+                class="badge {% if sale.status == 'completed' %}bg-success {% elif sale.status == 'pending' %}bg-warning {% elif sale.status == 'processing' %}bg-info {% else %}bg-danger{% endif %}"
+              >
+                {{ sale.get_status_display }}
+              </span>
+            </td>
+            <td>
+              <span class="badge bg-secondary"
+                >{{ sale.get_payment_method_display }}</span
+              >
+            </td>
+            <td>
+              <div class="dropdown">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  data-bs-toggle="dropdown"
+                >
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="{% url 'sales:sale_detail' sale.order_number %}"
+                    >
+                      <i class="fas fa-eye me-2"></i>View Details
+                    </a>
+                  </li>
+                  {% if sale.status != 'cancelled' %}
+                  <li>
+                    <!-- prettier-ignore -->
+                    <a class="dropdown-item text-danger" href="{% url 'sales:cancel_sale' sale.order_number %}">
+                        <i class="fas fa-times me-2"></i>Cancel
+                      </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <i
+                class="fas fa-shopping-cart fa-3x mb-3"
+                style="color: var(--text-muted)"
+              ></i>
+              <p style="color: var(--text-secondary)">No sales found</p>
+              <a
+                href="{% url 'sales:create_sale' %}"
+                class="btn btn-primary btn-sm"
+              >
+                <i class="fas fa-plus me-2"></i>Create Sale
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 
 <!-- Pagination -->
 {% if sales.has_other_pages %}
 <div class="d-flex justify-content-center mt-4">
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            {% if sales.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ sales.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-            </li>
-            {% endif %}
-            
-            {% for num in sales.paginator.page_range %}
-                {% if sales.number == num %}
-                <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                </li>
-                {% elif num > sales.number|add:'-3' and num < sales.number|add:'3' %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
-                </li>
-                {% endif %}
-            {% endfor %}
-            
-            {% if sales.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ sales.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if sales.has_previous %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ sales.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      </li>
+      <!-- prettier-ignore -->
+      {% endif %} {% for num in sales.paginator.page_range %} {% if sales.number == num %}
+      <li class="page-item active">
+        <span class="page-link">{{ num }}</span>
+      </li>
+      {% elif num > sales.number|add:'-3' and num < sales.number|add:'3' %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+          >{{ num }}</a
+        >
+      </li>
+      {% endif %} {% endfor %} {% if sales.has_next %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ sales.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
 </div>
 {% endif %}
 
 <style>
-    .stat-card {
-        padding: 1.5rem;
-        border-radius: 12px;
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-icon.primary { background: rgba(107, 33, 168, 0.1); color: var(--primary-color); }
-    .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
-    .stat-icon.info { background: rgba(59, 130, 246, 0.1); color: var(--info-color); }
-    
-    .stat-value {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-    
-    .table thead th {
-        background: var(--bg-secondary);
-        border-bottom: 2px solid var(--border-color);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        color: var(--text-secondary);
-    }
-    
-    .table tbody tr:hover {
-        background: var(--bg-secondary);
-    }
-    
-    .pagination .page-link {
-        background: var(--card-bg);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-    
-    .pagination .page-item.active .page-link {
-        background: var(--primary-color);
-        border-color: var(--primary-color);
-    }
+  .stat-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon.primary {
+    background: rgba(107, 33, 168, 0.1);
+    color: var(--primary-color);
+  }
+  .stat-icon.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+  }
+  .stat-icon.info {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info-color);
+  }
+
+  .stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .table thead th {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+  }
+
+  .table tbody tr:hover {
+    background: var(--bg-secondary);
+  }
+
+  .pagination .page-link {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .pagination .page-item.active .page-link {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+  }
 </style>
 {% endblock %}

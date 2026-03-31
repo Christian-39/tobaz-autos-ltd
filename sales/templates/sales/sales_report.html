@@ -1,232 +1,285 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
-
-{% block title %}{{ title }}{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load custom_filters %}{% load humanize %}
+<!-- prettier-ignore -->
+{% block title %}{{ title }}{% endblock %} {% block content %}
 <!-- Page Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-1" style="color: var(--text-primary);">Sales Report</h1>
-        <p class="mb-0" style="color: var(--text-secondary);">Analyze your sales performance</p>
-    </div>
-    <div class="d-flex gap-2">
-        <select class="form-select" onchange="window.location.href='?days=' + this.value">
-            <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 Days</option>
-            <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 Days</option>
-            <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 Days</option>
-            <option value="365" {% if days == 365 %}selected{% endif %}>Last Year</option>
-        </select>
-        <button class="btn btn-outline-primary" onclick="window.print()">
-            <i class="fas fa-print"></i>
-        </button>
-    </div>
+  <div>
+    <h1 class="h3 mb-1" style="color: var(--text-primary)">Sales Report</h1>
+    <p class="mb-0" style="color: var(--text-secondary)">
+      Analyze your sales performance
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <!-- prettier-ignore -->
+    <select class="form-select" onchange="window.location.href = '?days=' + this.value">
+      <option value="7" {% if days == 7 %}selected{% endif %}>
+        Last 7 Days
+      </option>
+      <option value="30" {% if days == 30 %}selected{% endif %}>
+        Last 30 Days
+      </option>
+      <option value="90" {% if days == 90 %}selected{% endif %}>
+        Last 90 Days
+      </option>
+      <option value="365" {% if days == 365 %}selected{% endif %}>
+        Last Year
+      </option>
+    </select>
+    <button class="btn btn-outline-primary" onclick="window.print()">
+      <i class="fas fa-print"></i>
+    </button>
+  </div>
 </div>
 
 <!-- Stats Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon primary">
-                <i class="fas fa-shopping-cart"></i>
-            </div>
-            <div class="stat-value">{{ total_sales }}</div>
-            <div class="stat-label">Total Sales</div>
-        </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon primary">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="stat-value">{{ total_sales }}</div>
+      <div class="stat-label">Total Sales</div>
     </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon success">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-value">${{ total_revenue|floatformat:2 }}</div>
-            <div class="stat-label">Total Revenue</div>
-        </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon success">
+        <i class="fas fa-dollar-sign"></i>
+      </div>
+      <div class="stat-value">₦{{ total_revenue|floatformat:2|intcomma }}</div>
+      <div class="stat-label">Total Revenue</div>
     </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon info">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stat-value">{{ total_items }}</div>
-            <div class="stat-label">Items Sold</div>
-        </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon info">
+        <i class="fas fa-box"></i>
+      </div>
+      <div class="stat-value">{{ total_items }}</div>
+      <div class="stat-label">Items Sold</div>
     </div>
+  </div>
 </div>
 
 <div class="row g-4">
-    <!-- Top Products -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0" style="color: var(--text-primary);">
-                    <i class="fas fa-trophy me-2" style="color: var(--primary-color);"></i>Top Selling Products
-                </h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Product</th>
-                                <th class="text-center">Quantity Sold</th>
-                                <th class="text-end">Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for product in product_sales %}
-                            <tr>
-                                <td>
-                                    <span class="badge {% if forloop.counter == 1 %}bg-warning{% elif forloop.counter == 2 %}bg-secondary{% elif forloop.counter == 3 %}bg-info{% else %}bg-light text-dark{% endif %}">
-                                        #{{ forloop.counter }}
-                                    </span>
-                                </td>
-                                <td style="color: var(--text-primary);">{{ product.product__name }}</td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary">{{ product.total_quantity }}</span>
-                                </td>
-                                <td class="text-end" style="color: var(--success-color); font-weight: 600;">
-                                    ${{ product.total_revenue|floatformat:2 }}
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center py-5">
-                                    <i class="fas fa-chart-bar fa-3x mb-3" style="color: var(--text-muted);"></i>
-                                    <p style="color: var(--text-secondary);">No sales data available</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <!-- Top Products -->
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i class="fas fa-trophy me-2" style="color: var(--primary-color)"></i
+          >Top Selling Products
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Product</th>
+                <th class="text-center">Quantity Sold</th>
+                <th class="text-end">Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in product_sales %}
+              <tr>
+                <td>
+                  <span
+                    class="badge {% if forloop.counter == 1 %}bg-warning{% elif forloop.counter == 2 %}bg-secondary{% elif forloop.counter == 3 %}bg-info{% else %}bg-light text-dark{% endif %}"
+                  >
+                    #{{ forloop.counter }}
+                  </span>
+                </td>
+                <td style="color: var(--text-primary)">
+                  {{ product.product__name }}
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-primary"
+                    >{{ product.total_quantity }}</span
+                  >
+                </td>
+                <td
+                  class="text-end"
+                  style="color: var(--success-color); font-weight: 600"
+                >
+                  ₦{{ product.total_revenue|floatformat:2|intcomma }}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center py-5">
+                  <i
+                    class="fas fa-chart-bar fa-3x mb-3"
+                    style="color: var(--text-muted)"
+                  ></i>
+                  <p style="color: var(--text-secondary)">
+                    No sales data available
+                  </p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
-    
-    <!-- Payment Methods -->
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0" style="color: var(--text-primary);">
-                    <i class="fas fa-credit-card me-2" style="color: var(--primary-color);"></i>Payment Methods
-                </h5>
-            </div>
-            <div class="card-body">
-                {% for payment in payment_method_sales %}
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas 
-                            {% if payment.payment_method == 'cash' %}fa-money-bill-wave text-success
-                            {% elif payment.payment_method == 'card' %}fa-credit-card text-primary
-                            {% elif payment.payment_method == 'transfer' %}fa-university text-info
-                            {% else %}fa-wallet text-secondary{% endif %}"></i>
-                        <span style="color: var(--text-primary);">{{ payment.get_payment_method_display|default:payment.payment_method|title }}</span>
-                    </div>
-                    <div class="text-end">
-                        <span class="badge bg-primary">{{ payment.count }}</span>
-                        <small class="d-block" style="color: var(--text-secondary);">${{ payment.total|floatformat:2 }}</small>
-                    </div>
-                </div>
-                {% if not forloop.last %}
-                <hr style="border-color: var(--border-color);">
-                {% endif %}
-                {% empty %}
-                <div class="text-center py-4">
-                    <i class="fas fa-credit-card fa-2x mb-2" style="color: var(--text-muted);"></i>
-                    <p class="mb-0" style="color: var(--text-secondary);">No payment data</p>
-                </div>
-                {% endfor %}
-            </div>
+  </div>
+
+  <!-- Payment Methods -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i
+            class="fas fa-credit-card me-2"
+            style="color: var(--primary-color)"
+          ></i
+          >Payment Methods
+        </h5>
+      </div>
+      <div class="card-body">
+        {% for payment in payment_method_sales %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <i
+              class="fas {% if payment.payment_method == 'cash' %}fa-money-bill-wave text-success {% elif payment.payment_method == 'card' %}fa-credit-card text-primary {% elif payment.payment_method == 'transfer' %}fa-university text-info {% else %}fa-wallet text-secondary{% endif %}"
+            ></i>
+            <span style="color: var(--text-primary)"
+              ><!--prettier-ignore-->
+              {{ payment.get_payment_method_display|default:payment.payment_method|title }}
+            </span>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-primary">{{ payment.count }}</span>
+            <small class="d-block" style="color: var(--text-secondary)">
+              ₦{{ payment.total|floatformat:2|intcomma }}
+            </small>
+          </div>
         </div>
-        
-        <!-- Quick Stats -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0" style="color: var(--text-primary);">
-                    <i class="fas fa-chart-pie me-2" style="color: var(--primary-color);"></i>Quick Stats
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <span style="color: var(--text-secondary);">Average Sale:</span>
-                    <span style="color: var(--text-primary); font-weight: 500;">
-                        ${{ total_revenue|default:0|div:total_sales|default:1|floatformat:2 }}
-                    </span>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span style="color: var(--text-secondary);">Average Items/Sale:</span>
-                    <span style="color: var(--text-primary); font-weight: 500;">
-                        {{ total_items|default:0|div:total_sales|default:1|floatformat:1 }}
-                    </span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span style="color: var(--text-secondary);">Period:</span>
-                    <span style="color: var(--text-primary); font-weight: 500;">Last {{ days }} Days</span>
-                </div>
-            </div>
+        {% if not forloop.last %}
+        <hr style="border-color: var(--border-color)" />
+        {% endif %} {% empty %}
+        <div class="text-center py-4">
+          <i
+            class="fas fa-credit-card fa-2x mb-2"
+            style="color: var(--text-muted)"
+          ></i>
+          <p class="mb-0" style="color: var(--text-secondary)">
+            No payment data
+          </p>
         </div>
+        {% endfor %}
+      </div>
     </div>
+
+    <!-- Quick Stats -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i
+            class="fas fa-chart-pie me-2"
+            style="color: var(--primary-color)"
+          ></i
+          >Quick Stats
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span style="color: var(--text-secondary)">Average Sale:</span>
+          <span style="color: var(--text-primary); font-weight: 500">
+            ₦{{ average_sale|floatformat:2|intcomma }}
+          </span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span style="color: var(--text-secondary)">Average Items/Sale:</span>
+          <span style="color: var(--text-primary); font-weight: 500">
+            {{ average_items|floatformat:1 }}
+          </span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span style="color: var(--text-secondary)">Period:</span>
+          <span style="color: var(--text-primary); font-weight: 500"
+            >Last {{ days }} Days</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-    .stat-card {
-        padding: 1.5rem;
-        border-radius: 12px;
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
+  .stat-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon.primary {
+    background: rgba(107, 33, 168, 0.1);
+    color: var(--primary-color);
+  }
+  .stat-icon.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+  }
+  .stat-icon.info {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info-color);
+  }
+
+  .stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .table thead th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  @media print {
+    .sidebar,
+    .top-navbar,
+    .bottom-nav,
+    select,
+    button {
+      display: none !important;
     }
-    
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+
+    .main-content {
+      margin-left: 0 !important;
     }
-    
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-icon.primary { background: rgba(107, 33, 168, 0.1); color: var(--primary-color); }
-    .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
-    .stat-icon.info { background: rgba(59, 130, 246, 0.1); color: var(--info-color); }
-    
-    .stat-value {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-    
-    .table thead th {
-        background: var(--bg-secondary);
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-    }
-    
-    @media print {
-        .sidebar, .top-navbar, .bottom-nav, select, button {
-            display: none !important;
-        }
-        
-        .main-content {
-            margin-left: 0 !important;
-        }
-    }
+  }
 </style>
 {% endblock %}

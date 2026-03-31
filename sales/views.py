@@ -39,11 +39,14 @@ def sale_list(request):
     total_revenue = Sale.objects.filter(status='completed').aggregate(
         total=Sum('total_amount')
     )['total'] or 0
+    average_sale = total_revenue / total_sales if total_sales > 0 else 0
+    
     
     context = {
         'sales': page_obj,
         'total_sales': total_sales,
         'total_revenue': total_revenue,
+        'average_sale': average_sale,
         'status': status,
         'search': search,
         'title': 'Sales - Tobaz Autos',
@@ -187,6 +190,9 @@ def sales_report(request):
     total_items = SaleItem.objects.filter(sale__in=completed_sales).aggregate(
         total=Sum('quantity')
     )['total'] or 0
+
+    average_sale = total_revenue / total_sales if total_sales > 0 else 0
+    average_items = total_items / total_sales if total_sales > 0 else 0
     
     # Sales by product
     product_sales = SaleItem.objects.filter(
@@ -206,6 +212,8 @@ def sales_report(request):
         'total_sales': total_sales,
         'total_revenue': total_revenue,
         'total_items': total_items,
+        'average_sale': average_sale,
+        'average_items': average_items,
         'product_sales': product_sales,
         'payment_method_sales': payment_method_sales,
         'days': days,

@@ -1,285 +1,384 @@
-{% extends 'base.html' %}
-
+{% extends 'base.html' %} {% load humanize %}<!--prettier-ignore-->
 {% block title %}{{ title }}{% endblock %}
 {% block meta_description %}{{ meta_description }}{% endblock %}
 
 {% block content %}
 <!-- Breadcrumb -->
 <nav aria-label="breadcrumb" class="mb-4">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'core:home' %}" style="color: var(--primary-color);">Home</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}" style="color: var(--primary-color);">Products</a></li>
-        <li class="breadcrumb-item active" style="color: var(--text-secondary);">{{ product.name|truncatechars:30 }}</li>
-    </ol>
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'core:home' %}" style="color: var(--primary-color)"
+        >Home</a
+      >
+    </li>
+    <li class="breadcrumb-item">
+      <a
+        href="{% url 'products:product_list' %}"
+        style="color: var(--primary-color)"
+        >Products</a
+      >
+    </li>
+    <li class="breadcrumb-item active" style="color: var(--text-secondary)">
+      {{ product.name|truncatechars:30 }}
+    </li>
+  </ol>
 </nav>
 
 <div class="row g-4">
-    <!-- Product Images & Videos -->
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-body p-0">
-                <!-- Main Image -->
-                <div class="position-relative">
-                    {% if product.primary_image %}
-                        <img id="mainImage" src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" class="w-100" style="height: 400px; object-fit: cover;">
-                    {% else %}
-                        <div class="w-100 d-flex align-items-center justify-content-center" style="height: 400px; background: var(--bg-tertiary);">
-                            <i class="fas fa-image fa-5x" style="color: var(--text-muted);"></i>
-                        </div>
-                    {% endif %}
-                    
-                    {% if product.stock_status == 'low_stock' %}
-                        <span class="badge bg-warning position-absolute" style="top: 15px; left: 15px;">Low Stock</span>
-                    {% elif product.stock_status == 'out_of_stock' %}
-                        <span class="badge bg-danger position-absolute" style="top: 15px; left: 15px;">Out of Stock</span>
-                    {% endif %}
-                    
-                    {% if product.is_featured %}
-                        <span class="badge position-absolute" style="top: 15px; right: 15px; background: var(--primary-color);">Featured</span>
-                    {% endif %}
-                </div>
-                
-                <!-- Thumbnail Gallery -->
-                {% if images|length > 1 %}
-                <div class="p-3">
-                    <div class="d-flex gap-2 overflow-auto pb-2">
-                        {% for image in images %}
-                        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" 
-                             class="thumbnail-img {% if image.is_primary %}active{% endif %}" 
-                             onclick="changeMainImage(this)"
-                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent;">
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
+  <!-- Product Images & Videos -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body p-0">
+        <!-- Main Image -->
+        <div class="position-relative">
+          {% if product.primary_image %}
+          <img
+            id="mainImage"
+            src="{{ product.primary_image.image.url }}"
+            alt="{{ product.name }}"
+            class="w-100"
+            style="height: 400px; object-fit: cover"
+          />
+          {% else %}
+          <div
+            class="w-100 d-flex align-items-center justify-content-center"
+            style="height: 400px; background: var(--bg-tertiary)"
+          >
+            <i class="fas fa-image fa-5x" style="color: var(--text-muted)"></i>
+          </div>
+          {% endif %} {% if product.stock_status == 'low_stock' %}
+          <span
+            class="badge bg-warning position-absolute"
+            style="top: 15px; left: 15px"
+            >Low Stock</span
+          >
+          {% elif product.stock_status == 'out_of_stock' %}
+          <span
+            class="badge bg-danger position-absolute"
+            style="top: 15px; left: 15px"
+            >Out of Stock</span
+          >
+          {% endif %} {% if product.is_featured %}
+          <span
+            class="badge position-absolute"
+            style="top: 15px; right: 15px; background: var(--primary-color)"
+            >Featured</span
+          >
+          {% endif %}
         </div>
-        
-        <!-- Videos Section -->
-        {% if videos %}
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0" style="color: var(--text-primary);">
-                    <i class="fas fa-video me-2" style="color: var(--primary-color);"></i>Product Videos
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    {% for video in videos %}
-                    <div class="col-12">
-                        <div class="position-relative">
-                            <video controls class="w-100 rounded" style="max-height: 300px;">
-                                <source src="{{ video.video.url }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                            {% if video.title %}
-                            <p class="mt-2 mb-0 small" style="color: var(--text-secondary);">{{ video.title }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+
+        <!-- Thumbnail Gallery -->
+        {% if images|length > 1 %}
+        <div class="p-3">
+          <div class="d-flex gap-2 overflow-auto pb-2">
+            {% for image in images %}
+            <img
+              src="{{ image.image.url }}"
+              alt="{{ image.alt_text|default:product.name }}"
+              class="thumbnail-img {% if image.is_primary %}active{% endif %}"
+              onclick="changeMainImage(this)"
+              style="
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 8px;
+                cursor: pointer;
+                border: 2px solid transparent;
+              "
+            />
+            {% endfor %}
+          </div>
         </div>
         {% endif %}
+      </div>
     </div>
-    
-    <!-- Product Details -->
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="badge mb-2" style="background: rgba(107, 33, 168, 0.1); color: var(--primary-color);">
-                            {{ product.category.name }}
-                        </span>
-                        <h1 class="h3 mb-2" style="color: var(--text-primary);">{{ product.name }}</h1>
-                        <p class="mb-0" style="color: var(--text-muted);">SKU: {{ product.sku }}</p>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="dropdown">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'dashboard:edit_product' product.slug %}">
-                                <i class="fas fa-edit me-2"></i>Edit Product
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'dashboard:inventory' %}">
-                                <i class="fas fa-warehouse me-2"></i>Manage Inventory
-                            </a></li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <span class="h2" style="color: var(--primary-color);">${{ product.price }}</span>
-                </div>
-                
-                <div class="mb-4">
-                    <h6 style="color: var(--text-primary);">Description</h6>
-                    <p style="color: var(--text-secondary); line-height: 1.8;">{{ product.description|linebreaks }}</p>
-                </div>
-                
-                {% if product.specifications %}
-                <div class="mb-4">
-                    <h6 style="color: var(--text-primary);">Specifications</h6>
-                    <p style="color: var(--text-secondary); line-height: 1.8;">{{ product.specifications|linebreaks }}</p>
-                </div>
+
+    <!-- Videos Section -->
+    {% if videos %}
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0" style="color: var(--text-primary)">
+          <i class="fas fa-video me-2" style="color: var(--primary-color)"></i
+          >Product Videos
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          {% for video in videos %}
+          <div class="col-12">
+            <div class="position-relative">
+              <video controls class="w-100 rounded" style="max-height: 300px">
+                <source src="{{ video.video.url }}" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              {% if video.title %}
+              <p class="mt-2 mb-0 small" style="color: var(--text-secondary)">
+                {{ video.title }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Product Details -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <span
+              class="badge mb-2"
+              style="
+                background: rgba(107, 33, 168, 0.1);
+                color: var(--primary-color);
+              "
+            >
+              {{ product.category.name }}
+            </span>
+            <h1 class="h3 mb-2" style="color: var(--text-primary)">
+              {{ product.name }}
+            </h1>
+            <p class="mb-0" style="color: var(--text-muted)">
+              SKU: {{ product.sku }}
+            </p>
+          </div>
+          <div class="dropdown">
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              data-bs-toggle="dropdown"
+            >
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="{% url 'dashboard:edit_product' product.slug %}"
+                >
+                  <i class="fas fa-edit me-2"></i>Edit Product
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'dashboard:inventory' %}">
+                  <i class="fas fa-warehouse me-2"></i>Manage Inventory
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <span class="h2" style="color: var(--primary-color)"
+            >₦{{ product.price |intcomma}}</span
+          >
+        </div>
+
+        <div class="mb-4">
+          <h6 style="color: var(--text-primary)">Description</h6>
+          <p style="color: var(--text-secondary); line-height: 1.8">
+            {{ product.description|linebreaks }}
+          </p>
+        </div>
+
+        {% if product.specifications %}
+        <div class="mb-4">
+          <h6 style="color: var(--text-primary)">Specifications</h6>
+          <p style="color: var(--text-secondary); line-height: 1.8">
+            {{ product.specifications|linebreaks }}
+          </p>
+        </div>
+        {% endif %}
+
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <div class="p-3 rounded" style="background: var(--bg-secondary)">
+              <small style="color: var(--text-muted)">Stock Quantity</small>
+              <p class="mb-0 h5" style="color: var(--text-primary)">
+                {{ product.quantity }} units
+              </p>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 rounded" style="background: var(--bg-secondary)">
+              <small style="color: var(--text-muted)">Total Sales</small>
+              <p class="mb-0 h5" style="color: var(--text-primary)">
+                {{ product.total_sales }} units
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <a
+            href="{% url 'sales:create_sale' %}"
+            class="btn btn-primary flex-fill {% if product.stock_status == 'out_of_stock' %}disabled{% endif %}"
+          >
+            <i class="fas fa-cash-register me-2"></i>Create Sale
+          </a>
+          <a
+            href="{% url 'dashboard:edit_product' product.slug %}"
+            class="btn btn-outline-secondary"
+          >
+            <i class="fas fa-edit me-2"></i>Edit
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Info Card -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h6 class="mb-3" style="color: var(--text-primary)">
+          Product Information
+        </h6>
+        <table class="table table-borderless mb-0">
+          <tbody>
+            <tr>
+              <td style="color: var(--text-muted); width: 40%">Category</td>
+              <td style="color: var(--text-primary)">
+                {{ product.category.name }}
+              </td>
+            </tr>
+            <tr>
+              <td style="color: var(--text-muted)">Type</td>
+              <td style="color: var(--text-primary)">
+                {{ product.get_category_type_display }}
+              </td>
+            </tr>
+            <tr>
+              <td style="color: var(--text-muted)">SKU</td>
+              <td style="color: var(--text-primary)">{{ product.sku }}</td>
+            </tr>
+            <tr>
+              <td style="color: var(--text-muted)">Status</td>
+              <td>
+                {% if product.is_active %}
+                <span class="badge bg-success">Active</span>
+                {% else %}
+                <span class="badge bg-secondary">Inactive</span>
                 {% endif %}
-                
-                <div class="row g-3 mb-4">
-                    <div class="col-6">
-                        <div class="p-3 rounded" style="background: var(--bg-secondary);">
-                            <small style="color: var(--text-muted);">Stock Quantity</small>
-                            <p class="mb-0 h5" style="color: var(--text-primary);">{{ product.quantity }} units</p>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="p-3 rounded" style="background: var(--bg-secondary);">
-                            <small style="color: var(--text-muted);">Total Sales</small>
-                            <p class="mb-0 h5" style="color: var(--text-primary);">{{ product.total_sales }} units</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <a href="{% url 'sales:create_sale' %}" class="btn btn-primary flex-fill {% if product.stock_status == 'out_of_stock' %}disabled{% endif %}">
-                        <i class="fas fa-cash-register me-2"></i>Create Sale
-                    </a>
-                    <a href="{% url 'dashboard:edit_product' product.slug %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-edit me-2"></i>Edit
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Product Info Card -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h6 class="mb-3" style="color: var(--text-primary);">Product Information</h6>
-                <table class="table table-borderless mb-0">
-                    <tbody>
-                        <tr>
-                            <td style="color: var(--text-muted); width: 40%;">Category</td>
-                            <td style="color: var(--text-primary);">{{ product.category.name }}</td>
-                        </tr>
-                        <tr>
-                            <td style="color: var(--text-muted);">Type</td>
-                            <td style="color: var(--text-primary);">{{ product.get_category_type_display }}</td>
-                        </tr>
-                        <tr>
-                            <td style="color: var(--text-muted);">SKU</td>
-                            <td style="color: var(--text-primary);">{{ product.sku }}</td>
-                        </tr>
-                        <tr>
-                            <td style="color: var(--text-muted);">Status</td>
-                            <td>
-                                {% if product.is_active %}
-                                    <span class="badge bg-success">Active</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">Inactive</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="color: var(--text-muted);">Added On</td>
-                            <td style="color: var(--text-primary);">{{ product.created_at|date:"F d, Y" }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color: var(--text-muted)">Added On</td>
+              <td style="color: var(--text-primary)">
+                {{ product.created_at|date:"F d, Y" }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Related Products -->
 {% if related_products %}
 <div class="mt-5">
-    <h3 class="h4 mb-4" style="color: var(--text-primary);">Related Products</h3>
-    <div class="row g-4">
-        {% for related in related_products %}
-        <div class="col-6 col-md-4 col-lg-3">
-            <div class="product-card">
-                <a href="{{ related.get_absolute_url }}">
-                    {% if related.primary_image %}
-                        <img src="{{ related.primary_image.image.url }}" alt="{{ related.name }}" class="product-image" style="height: 150px;">
-                    {% else %}
-                        <div class="product-image d-flex align-items-center justify-content-center" style="height: 150px; background: var(--bg-tertiary);">
-                            <i class="fas fa-image fa-2x" style="color: var(--text-muted);"></i>
-                        </div>
-                    {% endif %}
-                </a>
-                <div class="product-content">
-                    <h6 class="mb-1">
-                        <a href="{{ related.get_absolute_url }}" class="text-decoration-none" style="color: var(--text-primary);">
-                            {{ related.name|truncatechars:20 }}
-                        </a>
-                    </h6>
-                    <span class="product-price" style="font-size: 1rem;">${{ related.price }}</span>
-                </div>
-            </div>
+  <h3 class="h4 mb-4" style="color: var(--text-primary)">Related Products</h3>
+  <div class="row g-4">
+    {% for related in related_products %}
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="product-card">
+        <a href="{{ related.get_absolute_url }}">
+          {% if related.primary_image %}
+          <img
+            src="{{ related.primary_image.image.url }}"
+            alt="{{ related.name }}"
+            class="product-image"
+            style="height: 150px"
+          />
+          {% else %}
+          <div
+            class="product-image d-flex align-items-center justify-content-center"
+            style="height: 150px; background: var(--bg-tertiary)"
+          >
+            <i class="fas fa-image fa-2x" style="color: var(--text-muted)"></i>
+          </div>
+          {% endif %}
+        </a>
+        <div class="product-content">
+          <h6 class="mb-1">
+            <a
+              href="{{ related.get_absolute_url }}"
+              class="text-decoration-none"
+              style="color: var(--text-primary)"
+            >
+              {{ related.name|truncatechars:20 }}
+            </a>
+          </h6>
+          <span class="product-price" style="font-size: 1rem"
+            >₦{{ related.price|intcomma }}</span
+          >
         </div>
-        {% endfor %}
+      </div>
     </div>
+    {% endfor %}
+  </div>
 </div>
 {% endif %}
 
 <style>
-    .breadcrumb-item + .breadcrumb-item::before {
-        color: var(--text-muted);
-    }
-    
-    .thumbnail-img:hover,
-    .thumbnail-img.active {
-        border-color: var(--primary-color) !important;
-    }
-    
-    .product-card {
-        background: var(--card-bg);
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
-    }
-    
-    .product-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    
-    .product-image {
-        width: 100%;
-        object-fit: cover;
-    }
-    
-    .product-content {
-        padding: 1rem;
-    }
-    
-    .product-price {
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-    
-    .table td {
-        padding: 0.5rem 0;
-    }
+  .breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-muted);
+  }
+
+  .thumbnail-img:hover,
+  .thumbnail-img.active {
+    border-color: var(--primary-color) !important;
+  }
+
+  .product-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-image {
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .product-content {
+    padding: 1rem;
+  }
+
+  .product-price {
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  .table td {
+    padding: 0.5rem 0;
+  }
 </style>
 
 <script>
-    function changeMainImage(thumbnail) {
-        const mainImage = document.getElementById('mainImage');
-        if (mainImage) {
-            mainImage.src = thumbnail.src;
-            
-            // Update active state
-            document.querySelectorAll('.thumbnail-img').forEach(img => {
-                img.classList.remove('active');
-                img.style.borderColor = 'transparent';
-            });
-            thumbnail.classList.add('active');
-            thumbnail.style.borderColor = 'var(--primary-color)';
-        }
+  function changeMainImage(thumbnail) {
+    const mainImage = document.getElementById("mainImage");
+    if (mainImage) {
+      mainImage.src = thumbnail.src;
+
+      // Update active state
+      document.querySelectorAll(".thumbnail-img").forEach((img) => {
+        img.classList.remove("active");
+        img.style.borderColor = "transparent";
+      });
+      thumbnail.classList.add("active");
+      thumbnail.style.borderColor = "var(--primary-color)";
     }
+  }
 </script>
 {% endblock %}

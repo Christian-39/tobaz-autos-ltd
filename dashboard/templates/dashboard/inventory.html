@@ -1,267 +1,381 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
-
-{% block title %}{{ title }}{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load humanize %} {% load custom_filters %}
+<!--prettier-ignore-->
+{% block title %}{{ title }}{% endblock %} {% block content %}
 <!-- Page Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-1" style="color: var(--text-primary);">Inventory Management</h1>
-        <p class="mb-0" style="color: var(--text-secondary);">Track and manage your stock levels</p>
-    </div>
-    <a href="{% url 'dashboard:add_product' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Add Product
-    </a>
+  <div>
+    <h1 class="h3 mb-1" style="color: var(--text-primary)">
+      Inventory Management
+    </h1>
+    <p class="mb-0" style="color: var(--text-secondary)">
+      Track and manage your stock levels
+    </p>
+  </div>
+  <a href="{% url 'dashboard:add_product' %}" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>Add Product
+  </a>
 </div>
 
 <!-- Stats Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon primary">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-value">${{ total_value|floatformat:2 }}</div>
-            <div class="stat-label">Total Inventory Value</div>
-        </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon primary">
+        <i class="fas fa-dollar-sign"></i>
+      </div>
+      <div class="stat-value">₦{{ total_value|floatformat:2|intcomma }}</div>
+      <div class="stat-label">Total Inventory Value</div>
     </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon warning">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="stat-value">{{ low_stock_count }}</div>
-            <div class="stat-label">Low Stock Items</div>
-        </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon warning">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="stat-value">{{ low_stock_count }}</div>
+      <div class="stat-label">Low Stock Items</div>
     </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon danger">
-                <i class="fas fa-times-circle"></i>
-            </div>
-            <div class="stat-value">{{ out_of_stock_count }}</div>
-            <div class="stat-label">Out of Stock</div>
-        </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon danger">
+        <i class="fas fa-times-circle"></i>
+      </div>
+      <div class="stat-value">{{ out_of_stock_count }}</div>
+      <div class="stat-label">Out of Stock</div>
     </div>
+  </div>
 </div>
 
 <!-- Filters -->
 <div class="card mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label small" style="color: var(--text-secondary);">Stock Filter</label>
-                <select name="stock" class="form-select" onchange="this.form.submit()">
-                    <option value="">All Products</option>
-                    <option value="low" {% if stock_filter == 'low' %}selected{% endif %}>Low Stock (≤5)</option>
-                    <option value="out" {% if stock_filter == 'out' %}selected{% endif %}>Out of Stock</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <a href="{% url 'dashboard:inventory' %}" class="btn btn-outline-secondary w-100">
-                    <i class="fas fa-times me-2"></i>Clear Filter
-                </a>
-            </div>
-        </form>
-    </div>
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small" style="color: var(--text-secondary)"
+          >Stock Filter</label
+        >
+        <select name="stock" class="form-select" onchange="this.form.submit()">
+          <option value="">All Products</option>
+          <option
+            value="low"
+            {%
+            if
+            stock_filter=""
+            ="low"
+            %}selected{%
+            endif
+            %}
+          >
+            Low Stock (≤5)
+          </option>
+          <option
+            value="out"
+            {%
+            if
+            stock_filter=""
+            ="out"
+            %}selected{%
+            endif
+            %}
+          >
+            Out of Stock
+          </option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <a
+          href="{% url 'dashboard:inventory' %}"
+          class="btn btn-outline-secondary w-100"
+        >
+          <i class="fas fa-times me-2"></i>Clear Filter
+        </a>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Inventory Table -->
 <div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>SKU</th>
-                        <th>Price</th>
-                        <th>Current Stock</th>
-                        <th>Value</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in products %}
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center gap-3">
-                                {% if product.primary_image %}
-                                    <img src="{{ product.primary_image.image.url }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
-                                {% else %}
-                                    <div style="width: 40px; height: 40px; background: var(--bg-tertiary); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-image" style="color: var(--text-muted); font-size: 0.875rem;"></i>
-                                    </div>
-                                {% endif %}
-                                <a href="{{ product.get_absolute_url }}" style="color: var(--primary-color);">
-                                    {{ product.name|truncatechars:30 }}
-                                </a>
-                            </div>
-                        </td>
-                        <td style="color: var(--text-secondary);">{{ product.sku }}</td>
-                        <td style="color: var(--text-primary);">${{ product.price }}</td>
-                        <td>
-                            <span class="badge 
-                                {% if product.quantity > 5 %}bg-success
-                                {% elif product.quantity > 0 %}bg-warning
-                                {% else %}bg-danger{% endif %}">
-                                {{ product.quantity }}
-                            </span>
-                        </td>
-                        <td style="color: var(--primary-color); font-weight: 500;">${{ product.price|multiply:product.quantity }}</td>
-                        <td>
-                            {% if product.quantity == 0 %}
-                                <span class="badge bg-danger">Out of Stock</span>
-                            {% elif product.quantity <= 5 %}
-                                <span class="badge bg-warning">Low Stock</span>
-                            {% else %}
-                                <span class="badge bg-success">In Stock</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#updateStockModal{{ product.id }}">
-                                <i class="fas fa-edit me-1"></i>Update
-                            </button>
-                        </td>
-                    </tr>
-                    
-                    <!-- Update Stock Modal -->
-                    <div class="modal fade" id="updateStockModal{{ product.id }}" tabindex="-1">
-                        <div class="modal-dialog modal-sm">
-                            <div class="modal-content" style="background: var(--card-bg);">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" style="color: var(--text-primary);">Update Stock</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form method="post" action="{% url 'dashboard:inventory' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product_id" value="{{ product.id }}">
-                                    <div class="modal-body">
-                                        <p class="mb-2" style="color: var(--text-secondary);">{{ product.name }}</p>
-                                        <div class="mb-3">
-                                            <label class="form-label" style="color: var(--text-primary);">New Quantity</label>
-                                            <input type="number" name="quantity" class="form-control" min="0" value="{{ product.quantity }}" required>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Update</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Price</th>
+            <th>Current Stock</th>
+            <th>Value</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% if product.primary_image %}
+                <img
+                  src="{{ product.primary_image.image.url }}"
+                  alt=""
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    object-fit: cover;
+                    border-radius: 6px;
+                  "
+                />
+                {% else %}
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: var(--bg-tertiary);
+                    border-radius: 6px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fas fa-image"
+                    style="color: var(--text-muted); font-size: 0.875rem"
+                  ></i>
+                </div>
+                {% endif %}
+                <a
+                  href="{{ product.get_absolute_url }}"
+                  style="color: var(--primary-color)"
+                >
+                  {{ product.name|truncatechars:30 }}
+                </a>
+              </div>
+            </td>
+            <td style="color: var(--text-secondary)">{{ product.sku }}</td>
+            <td style="color: var(--text-primary)">
+              ₦{{ product.price|intcomma }}
+            </td>
+            <td>
+              <span
+                class="badge {% if product.quantity > 5 %}bg-success {% elif product.quantity > 0 %}bg-warning {% else %}bg-danger{% endif %}"
+              >
+                {{ product.quantity }}
+              </span>
+            </td>
+            <td style="color: var(--primary-color); font-weight: 500">
+              ₦{{ product.price|multiply:product.quantity }}
+            </td>
+            <td>
+              {% if product.quantity == 0 %}
+              <span class="badge bg-danger">Out of Stock</span>
+              {% elif product.quantity <= 5 %}
+              <span class="badge bg-warning">Low Stock</span>
+              {% else %}
+              <span class="badge bg-success">In Stock</span>
+              {% endif %}
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#updateStockModal{{ product.id }}"
+              >
+                <i class="fas fa-edit me-1"></i>Update
+              </button>
+            </td>
+          </tr>
+
+          <!-- Update Stock Modal -->
+          <div
+            class="modal fade"
+            id="updateStockModal{{ product.id }}"
+            tabindex="-1"
+          >
+            <div class="modal-dialog modal-sm">
+              <div class="modal-content" style="background: var(--card-bg)">
+                <div class="modal-header">
+                  <h5 class="modal-title" style="color: var(--text-primary)">
+                    Update Stock
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+                <form method="post" action="{% url 'dashboard:inventory' %}">
+                  {% csrf_token %}
+                  <input
+                    type="hidden"
+                    name="product_id"
+                    value="{{ product.id }}"
+                  />
+                  <div class="modal-body">
+                    <p class="mb-2" style="color: var(--text-secondary)">
+                      {{ product.name }}
+                    </p>
+                    <div class="mb-3">
+                      <label
+                        class="form-label"
+                        style="color: var(--text-primary)"
+                        >New Quantity</label
+                      >
+                      <input
+                        type="number"
+                        name="quantity"
+                        class="form-control"
+                        min="0"
+                        value="{{ product.quantity }}"
+                        required
+                      />
                     </div>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center py-5">
-                            <i class="fas fa-warehouse fa-3x mb-3" style="color: var(--text-muted);"></i>
-                            <p style="color: var(--text-secondary);">No products found</p>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      Update
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <i
+                class="fas fa-warehouse fa-3x mb-3"
+                style="color: var(--text-muted)"
+              ></i>
+              <p style="color: var(--text-secondary)">No products found</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 
 <!-- Pagination -->
 {% if products.has_other_pages %}
 <div class="d-flex justify-content-center mt-4">
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            {% if products.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ products.previous_page_number }}{% if stock_filter %}&stock={{ stock_filter }}{% endif %}">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-            </li>
-            {% endif %}
-            
-            {% for num in products.paginator.page_range %}
-                {% if products.number == num %}
-                <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                </li>
-                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}{% if stock_filter %}&stock={{ stock_filter }}{% endif %}">{{ num }}</a>
-                </li>
-                {% endif %}
-            {% endfor %}
-            
-            {% if products.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ products.next_page_number }}{% if stock_filter %}&stock={{ stock_filter }}{% endif %}">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if products.has_previous %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ products.previous_page_number }}{% if stock_filter %}&stock={{ stock_filter }}{% endif %}"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      </li>
+      <!--prettier-ignore-->
+      {% endif %} {% for num in products.paginator.page_range %} {% if products.number == num %}
+      <li class="page-item active">
+        <span class="page-link">{{ num }}</span>
+      </li>
+      <!--prettier-ignore-->
+      {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ num }}{% if stock_filter %}&stock={{ stock_filter }}{% endif %}"
+          >{{ num }}</a
+        >
+      </li>
+      {% endif %} {% endfor %} {% if products.has_next %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ products.next_page_number }}{% if stock_filter %}&stock={{ stock_filter }}{% endif %}"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
 </div>
 {% endif %}
 
 <style>
-    .stat-card {
-        padding: 1.5rem;
-        border-radius: 12px;
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-icon.primary { background: rgba(107, 33, 168, 0.1); color: var(--primary-color); }
-    .stat-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
-    .stat-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
-    
-    .stat-value {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-    
-    .table thead th {
-        background: var(--bg-secondary);
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-    }
-    
-    .pagination .page-link {
-        background: var(--card-bg);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-    
-    .pagination .page-item.active .page-link {
-        background: var(--primary-color);
-        border-color: var(--primary-color);
-    }
+  .stat-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon.primary {
+    background: rgba(107, 33, 168, 0.1);
+    color: var(--primary-color);
+  }
+  .stat-icon.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+  }
+  .stat-icon.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+  }
+
+  .stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .table thead th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .pagination .page-link {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .pagination .page-item.active .page-link {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+  }
 </style>
 {% endblock %}
